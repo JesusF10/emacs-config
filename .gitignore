@@ -1,0 +1,22 @@
+# Ignore compiled Emacs Lisp files
+*.elc
+
+# Ignore auto-generated custom settings
+custom.el
+
+# Ignore recent opened files
+recentf
+
+# Ignore eshell history
+eshell/
+
+# Ignore backup files
+*~
+\#*\#
+
+# Ignore generated package files
+elpa/
+tree-sitter/
+
+# Ignore Emacs Lisp Native-compiled files
+eln-cache/
