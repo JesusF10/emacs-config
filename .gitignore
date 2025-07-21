@@ -1,22 +1,58 @@
-# Ignore compiled Emacs Lisp files
-*.elc
-
-# Ignore auto-generated custom settings
-custom.el
-
-# Ignore recent opened files
-recentf
-
-# Ignore eshell history
-eshell/
-
-# Ignore backup files
+# Emacs temporary files
 *~
 \#*\#
+.\#*
 
-# Ignore generated package files
+# Auto-save files
+auto-save-list/
+auto-saves/
+backups/
+
+# Compiled Lisp files
+*.elc
+
+# Native compilation cache
+eln-cache/
+
+# Package directories
+elpaca/
 elpa/
+
+# Session files
+.session
+session.*
+
+# Desktop files
+.emacs.desktop
+.emacs.desktop.lock
+
+# Bookmark files
+bookmarks
+
+# Recent files
+recentf
+
+# URL cache
+url/
+
+# Tramp files
+tramp
+
+# Custom files (if you use customize)
+custom.el
+
+# Org mode temporary files
+*.org~
+
+# Log files
+*.log
+
+# Eshell history
+eshell/
+
+# Tree-sitter files
 tree-sitter/
 
-# Ignore Emacs Lisp Native-compiled files
-eln-cache/
+# Other temporary directories
+tmp/
+temp/
