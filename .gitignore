@@ -56,3 +56,9 @@ tree-sitter/
 # Other temporary directories
 tmp/
 temp/
+
+# Org mode temporary files
+*.org~
+
+# Place files
+places
