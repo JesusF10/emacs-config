@@ -15,15 +15,15 @@ A clean, modular Emacs configuration using the [Elpaca](https://github.com/progf
 .
 ├── init.el              # Main entry point
 ├── early-init.el        # Early initialization (optional)
-├── lisp/               # Configuration modules
-│   ├── packages.el     # Package management (Elpaca setup)
-│   ├── ui.el          # UI and appearance settings
-│   ├── editor.el      # Editor enhancements
-│   ├── keybindings.el # Custom keybindings
-│   ├── lsp.el         # LSP and programming support
-│   ├── org-mode.el    # Org-mode configuration
-│   └── utils.el       # Utility functions
-└── README.md           # This file
+├── lisp/                # Configuration modules
+│   ├── packages.el      # Package management (Elpaca setup)
+│   ├── ui.el            # UI and appearance settings
+│   ├── editor.el        # Editor enhancements
+│   ├── keybindings.el   # Custom keybindings
+│   ├── lsp.el           # LSP and programming support
+│   ├── org-mode.el      # Org-mode configuration
+│   └── utils.el         # Utility functions
+└── README.md            # This file
 ```
 
 ## Installation
@@ -91,9 +91,4 @@ Each module in the `lisp/` directory handles a specific aspect of the configurat
 
 Feel free to fork this repository and customize it for your needs. If you have improvements or bug fixes, pull requests are welcome!
 
-## License
-
-This configuration is provided as-is under the MIT license. See individual package licenses for their respective terms.
 ## Author: Jesus Flores Lacarra
-
-## TODO
