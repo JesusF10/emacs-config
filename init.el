@@ -24,3 +24,5 @@
 (load-config-module "org-mode")    ;; Org-mode customizations
 (load-config-module "utils")       ;; Utilities & misc
 
+;; Restore GC threshold
+(setq gc-cons-threshold (* 2 1000 1000))
