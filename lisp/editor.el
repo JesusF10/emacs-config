@@ -92,7 +92,7 @@
   
   ;; Configure attributes (visual enhancements)
   (setq dirvish-attributes
-        '(vc-state subtree-state all-the-icons collapse git-msg file-time file-size))
+        '(vc-state subtree-state nerd-icons collapse git-msg file-time file-size))
   
   :bind
   (("C-c C-f" . dirvish)

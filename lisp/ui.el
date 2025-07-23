@@ -42,7 +42,7 @@
   (catppuccin-reload)) ;; Flavors: latte, frappe, macchiato, mocha
 
 ;; Font configuration
-(use-package all-the-icons
+(use-package nerd-icons
   :ensure t
   :if (display-graphic-p))
 

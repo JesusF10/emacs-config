@@ -49,14 +49,14 @@ A clean, modular Emacs configuration using the [Elpaca](https://github.com/progf
    
    **Method 1 - Automatic (Recommended):**
    ```
-   M-x all-the-icons-install-fonts
+   M-x nerd-icons-install-fonts
    ```
    
    **Method 2 - Manual Installation:**
    ```bash
    cd /tmp
-   git clone https://github.com/domtronn/all-the-icons.el.git
-   cd all-the-icons.el/fonts
+   git clone https://github.com/rainstormstudio/nerd-icons.el.git
+   cd nerd-icons.el/fonts
    mkdir -p ~/.local/share/fonts
    cp *.ttf ~/.local/share/fonts/
    fc-cache -f -v
@@ -74,7 +74,7 @@ This configuration includes the following packages, organized by functionality:
 
 ### UI and Appearance
 - **[catppuccin-theme](https://github.com/catppuccin/emacs)**: Soothing pastel theme with multiple flavors (using Mocha variant)
-- **[all-the-icons](https://github.com/domtronn/all-the-icons.el)**: Icon fonts and utilities for displaying file type icons
+- **[nerd-icons](https://github.com/rainstormstudio/nerd-icons.el)**: Modern icon fonts and utilities for displaying file type icons
 - **[doom-modeline](https://github.com/seagle0128/doom-modeline)**: Modern, beautiful modeline with rich information display
 
 ### Completion and Navigation
@@ -171,7 +171,7 @@ Each module in the `lisp/` directory handles a specific aspect of the configurat
 
 - GNU Emacs 27.1 or later
 - Git (for package installation)
-- Font support for icons (automatically installed via `all-the-icons-install-fonts`)
+- Font support for icons (automatically installed via `nerd-icons-install-fonts`)
 - Optional: `ripgrep` for fast project-wide searching
 - Optional: `fd` for enhanced file finding (used by dirvish for large directories)
 
