@@ -34,17 +34,71 @@
 ;; Highlight current line
 (global-hl-line-mode 1)
 
-;; Theme configuration
-(use-package catppuccin-theme
+(use-package doom-themes
   :ensure t
+  :custom
+  ;; Global settings (defaults)
+  (doom-themes-enable-bold t)   ; if nil, bold is universally disabled
+  (doom-themes-enable-italic t) ; if nil, italics is universally disabled
+  ;; for treemacs users
+  ;; (doom-themes-treemacs-theme "doom-atom") ; use "doom-colors" for less minimal icon theme
   :config
-  (setq catppuccin-flavor 'mocha)
-  (catppuccin-reload)) ;; Flavors: latte, frappe, macchiato, mocha
+  (load-theme 'doom-one t)
+
+  ;; Enable flashing mode-line on errors
+  (doom-themes-visual-bell-config)
+  ;; Enable custom neotree theme (nerd-icons must be installed!)
+  ;; (doom-themes-neotree-config)
+  ;; or for treemacs users
+  ;; (doom-themes-treemacs-config)
+  ;; Corrects (and improves) org-mode's native fontification.
+  (doom-themes-org-config))
 
 ;; Font configuration
 (use-package nerd-icons
   :ensure t
   :if (display-graphic-p))
+
+;; Better default font (if available)
+(when (display-graphic-p)
+  (cond
+   ;; Try different fonts in order of preference
+   ((find-font (font-spec :name "JetBrains Mono"))
+    (set-face-attribute 'default nil :font "JetBrains Mono-12"))
+   ((find-font (font-spec :name "Fira Code"))
+    (set-face-attribute 'default nil :font "Fira Code-12"))
+   ((find-font (font-spec :name "Source Code Pro"))
+    (set-face-attribute 'default nil :font "Source Code Pro-12"))
+   ((find-font (font-spec :name "Consolas"))
+    (set-face-attribute 'default nil :font "Consolas-12"))))
+
+;; Rainbow delimiters for better bracket visibility
+(use-package rainbow-delimiters
+  :ensure t
+  :hook (prog-mode . rainbow-delimiters-mode))
+
+;; Highlight indentation guides
+(use-package highlight-indent-guides
+  :ensure t
+  :hook (prog-mode . highlight-indent-guides-mode)
+  :custom
+  (highlight-indent-guides-method 'character)
+  (highlight-indent-guides-character ?│)
+  (highlight-indent-guides-responsive 'top))
+
+;; Show colors for color codes
+(use-package rainbow-mode
+  :ensure t
+  :hook (css-mode . rainbow-mode))
+
+;; Beacon - highlight cursor position
+(use-package beacon
+  :ensure t
+  :config
+  (beacon-mode 1)
+  :custom
+  (beacon-size 20)
+  (beacon-blink-when-point-moves-vertically 10))
 
 ;; Doom modeline configuration
 (use-package doom-modeline
@@ -67,5 +121,28 @@
   (doom-modeline-checker-simple t)
   (doom-modeline-vcs-max-length 15))
 
+;; Ace window for quick window switching
+(use-package ace-window
+  :ensure t
+  :bind ("M-o" . ace-window)
+  :custom
+  (aw-keys '(?a ?s ?d ?f ?g ?h ?j ?k ?l))
+  (aw-background nil))
+
+;; Better window management
+(use-package winner
+  :config
+  (winner-mode 1)
+  :bind
+  (("C-c <left>" . winner-undo)
+   ("C-c <right>" . winner-redo)))
+
+;; Smooth scrolling
+(use-package smooth-scrolling
+  :ensure t
+  :config
+  (smooth-scrolling-mode 1)
+  :custom
+  (smooth-scroll-margin 2))
 
 ;;; ui.el ends here

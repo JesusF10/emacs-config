@@ -6,24 +6,85 @@
 
 ;;; Code:
 
-;; Better defaults
+;; Basic editor settings
 (setq-default indent-tabs-mode nil)
-(setq-default tab-width 4)
 (setq sentence-end-double-space nil)
 (setq require-final-newline t)
 (setq tab-always-indent 'complete)
 
+;; Helper function for paths from home directory
+(defun path-from-home (path)
+  "Return the absolute path from the user's home directory."
+  (expand-file-name path user-emacs-directory))
+
 ;; Backup and auto-save settings
-(setq backup-directory-alist `(("." . ,(expand-file-name "backups" user-emacs-directory))))
-(setq auto-save-file-name-transforms `((".*" ,(expand-file-name "auto-saves/" user-emacs-directory) t)))
+(use-package files
+  :ensure nil  ;; Mark as built-in
+  :custom
+  (make-backup-files t)  ;; Enable backup files
+  (backup-by-copying t)  ;; Backup by copying
+  (version-control t)  ;; Enable version control for backups
+  (delete-old-versions t)  ;; Delete old versions
+  (kept-old-versions 6)  ;; Number of old versions to keep
+  (kept-new-versions 6)  ;; Number of new versions to keep
+  (backup-directory-alist `(("." . ,(path-from-home "backups"))))  ;; Set backup directory
+  :config
+  ;; Ensure backup directory exists
+  (unless (file-exists-p (path-from-home "backups"))
+    (make-directory (path-from-home "backups") t)))  ;; Create backup directory if it doesn't exist
+
 
 ;; Better scrolling
 (setq scroll-margin 0
       scroll-conservatively 100000
       scroll-preserve-screen-position 1)
 
-;; Delete selection mode
-(delete-selection-mode 1)
+;;; Delete Selection Mode
+(use-package delsel
+  :config
+  (delete-selection-mode 1))
+
+;; Key Unbinding for avoiding frame suspension
+(use-package frame
+  :ensure nil  ;; Mark as built-in
+  :config
+  (unbind-key (kbd "C-z") global-map)      
+  (unbind-key (kbd "C-x C-z") global-map))
+
+;; Help Window Behavior
+(use-package help
+  :ensure nil  ;; Mark as built-in
+  :custom
+  (help-window-select t))  ;; Automatically select the help window after opening it
+
+;; Narrowing to Page
+(use-package page
+  :ensure nil  ;; Mark as built-in
+  :config
+  (put 'narrow-to-region 'disabled nil)
+  (put 'narrow-to-page 'disabled nil))  ;; Enable the 'narrow-to-page' function
+
+;;; Easy Window Navigation
+(use-package windmove
+  :config
+  (windmove-default-keybindings))
+
+;; Unique Buffer Names
+(use-package uniquify
+  :ensure nil  ;; Mark as built-in
+  :custom
+  (uniquify-buffer-name-style 'forward)  ;; Use forward style for unique buffer names
+  (uniquify-separator " › "))  ;; Set the separator for unique buffer names
+
+;;; Recently Opened Files
+(use-package recentf
+  :custom
+  (recentf-max-menu-items 50)
+  (recentf-max-saved-items 50)
+  (recentf-save-file (path-from-home "recentf"))
+  :bind ("C-x C-r" . recentf-open-files)
+  :init
+  (recentf-mode 1))
 
 ;; Auto-revert buffers when files change on disk
 (global-auto-revert-mode 1)
@@ -41,10 +102,6 @@
 
 ;; Save place in files
 (save-place-mode 1)
-
-;; Recent files
-(recentf-mode 1)
-(setq recentf-max-saved-items 50)
 
 ;; Modern completion and fuzzy finding
 ;; Vertico: A performant and minimalistic vertical completion UI

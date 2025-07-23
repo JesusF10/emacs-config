@@ -16,6 +16,11 @@
 (global-set-key (kbd "C-c k") 'windmove-up)
 (global-set-key (kbd "C-c l") 'windmove-right)
 
+;; Enhanced window management
+(global-set-key (kbd "M-o") 'ace-window)        ; Quick window switching
+(global-set-key (kbd "C-c <left>") 'winner-undo)   ; Undo window changes
+(global-set-key (kbd "C-c <right>") 'winner-redo)  ; Redo window changes
+
 ;; Buffer management
 (global-set-key (kbd "C-c b") 'consult-buffer)  ; Use consult-buffer instead of switch-to-buffer
 (global-set-key (kbd "C-c k") 'kill-buffer)
