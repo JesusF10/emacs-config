@@ -34,4 +34,38 @@
 ;; Highlight current line
 (global-hl-line-mode 1)
 
+;; Theme configuration
+(use-package catppuccin-theme
+  :ensure t
+  :config
+  (setq catppuccin-flavor 'mocha)
+  (catppuccin-reload)) ;; Flavors: latte, frappe, macchiato, mocha
+
+;; Font configuration
+(use-package all-the-icons
+  :ensure t
+  :if (display-graphic-p))
+
+;; Doom modeline configuration
+(use-package doom-modeline
+  :ensure t
+  :if (display-graphic-p)
+  :init (doom-modeline-mode 1)
+  :custom
+  (doom-modeline-support-imenu t)
+  (doom-modeline-height 30)
+  (doom-modeline-bar-width 5)
+  (doom-modeline-icon t)
+  (doom-modeline-major-mode-icon t)
+  (doom-modeline-minor-modes nil)
+  (doom-modeline-major-mode-color-icon t)
+  (doom-modeline-buffer-state-icon t)
+  (doom-modeline-buffer-file-name-style 'truncate-with-project)
+  (doom-modeline-buffer-modification-icon t)
+  (doom-modeline-env-version t)
+  (doom-modeline-indent-info t)
+  (doom-modeline-checker-simple t)
+  (doom-modeline-vcs-max-length 15))
+
+
 ;;; ui.el ends here
