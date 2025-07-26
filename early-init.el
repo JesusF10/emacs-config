@@ -1,10 +1,8 @@
-;;; early-init.el --- Emacs configuration early entry point 
+;;; early-init.el --- Emacs configuration early entry point -*- lexical-binding: t; -*-
 
 ;;; Commentary:
 ;; This is the early configuration entry point for Emacs.
 ;; It loads some configurations to optimize startup and ui design.
-
-;;; Code:
 
 (setq package-enable-at-startup nil) ;; Prevent Emacs from loading packages early
 (setq native-comp-async-report-warnings-errors 'silent) ;; Silence native-comp warnings

@@ -3,7 +3,10 @@
 ;;; Commentary:
 ;; This file contains UI customizations, themes, fonts, and visual settings.
 
-;;; Code:
+
+;;;;;;;;;;;;;;;;;;;;;;;;;
+;; Basic Customization ;;
+;;;;;;;;;;;;;;;;;;;;;;;;;
 
 ;; Basic UI improvements
 (when (fboundp 'tool-bar-mode)
@@ -34,6 +37,11 @@
 ;; Highlight current line
 (global-hl-line-mode 1)
 
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; Themes Customization ;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;
+
 (use-package doom-themes
   :ensure t
   :custom
@@ -43,8 +51,7 @@
   ;; for treemacs users
   ;; (doom-themes-treemacs-theme "doom-atom") ; use "doom-colors" for less minimal icon theme
   :config
-  (load-theme 'doom-one t)
-
+  (load-theme 'doom-moonlight t)
   ;; Enable flashing mode-line on errors
   (doom-themes-visual-bell-config)
   ;; Enable custom neotree theme (nerd-icons must be installed!)
@@ -53,6 +60,10 @@
   ;; (doom-themes-treemacs-config)
   ;; Corrects (and improves) org-mode's native fontification.
   (doom-themes-org-config))
+
+;;;;;;;;;;;;;;;;;;;;;;;;;
+;; Icons Customization ;;
+;;;;;;;;;;;;;;;;;;;;;;;;;
 
 ;; Font configuration
 (use-package nerd-icons
@@ -72,6 +83,11 @@
    ((find-font (font-spec :name "Consolas"))
     (set-face-attribute 'default nil :font "Consolas-12"))))
 
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; Delimeters Customization ;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
 ;; Rainbow delimiters for better bracket visibility
 (use-package rainbow-delimiters
   :ensure t
@@ -86,6 +102,11 @@
   (highlight-indent-guides-character ?│)
   (highlight-indent-guides-responsive 'top))
 
+
+;;;;;;;;;;;;;;;;;
+;; Color Codes ;;
+;;;;;;;;;;;;;;;;;
+
 ;; Show colors for color codes
 (use-package rainbow-mode
   :ensure t
@@ -99,6 +120,11 @@
   :custom
   (beacon-size 20)
   (beacon-blink-when-point-moves-vertically 10))
+
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; Modeline Customization ;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 ;; Doom modeline configuration
 (use-package doom-modeline
@@ -121,21 +147,10 @@
   (doom-modeline-checker-simple t)
   (doom-modeline-vcs-max-length 15))
 
-;; Ace window for quick window switching
-(use-package ace-window
-  :ensure t
-  :bind ("M-o" . ace-window)
-  :custom
-  (aw-keys '(?a ?s ?d ?f ?g ?h ?j ?k ?l))
-  (aw-background nil))
 
-;; Better window management
-(use-package winner
-  :config
-  (winner-mode 1)
-  :bind
-  (("C-c <left>" . winner-undo)
-   ("C-c <right>" . winner-redo)))
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; Scrolling Customization ;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 ;; Smooth scrolling
 (use-package smooth-scrolling
@@ -144,5 +159,17 @@
   (smooth-scrolling-mode 1)
   :custom
   (smooth-scroll-margin 2))
+
+
+;;;;;;;;;;;;;;;;;;;;;;;;;
+;; Aditional settings: ;;
+;;;;;;;;;;;;;;;;;;;;;;;;;
+
+;;; Document Viewing (PDFs, Images)
+(use-package doc-view
+  :when (display-graphic-p)
+  :custom
+  (doc-view-resolution 200))
+
 
 ;;; ui.el ends here
