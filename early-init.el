@@ -15,7 +15,9 @@
 
 ;; Reduce garbage collection during startup
 (setq gc-cons-threshold most-positive-fixnum)
-(add-hook 'after-init-hook (lambda () (setq gc-cons-threshold (* 50 1000 1000))))
+
+;; Restore garbage collection after startup
+(add-hook 'after-init-hook (lambda () (setq gc-cons-threshold (* 50 1024 1024))))
 
 ;; Prevent unnecessary UI elements
 (menu-bar-mode -1)
@@ -28,7 +30,6 @@
 ;; Prevent implicit frame resizing
 (setq frame-inhibit-implied-resize t)
 
-(setq gc-cons-threshold (* 100 1024 1024)) ;; speed up init
 (setq read-process-output-max (* 1024 1024)) ;; for LSP
 
 ;; early-init.el ends here

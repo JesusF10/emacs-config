@@ -87,11 +87,11 @@
 (global-auto-revert-mode 1)
 
 ;; Use package for eldoc-box
-;(use-package eldoc-box
-;  :ensure t
-;  :hook (eldoc-mode . eldoc-box-hover-mode) ;; Enable eldoc-box in eldoc mode
-;  :config
-;  (setq eldoc-box-border-color "black"))  ;; Set the border color (optional)
+(use-package eldoc-box
+  :ensure t
+  :hook (eldoc-mode . eldoc-box-hover-at-point-mode) ;; Enable eldoc-box in eldoc mode
+  :config
+  (setq eldoc-box-border-color "black"))  ;; Set the border color (optional)
 
 
 ;;;;;;;;;;;;;;;;;;
@@ -239,18 +239,18 @@
          ("C-o" . crux-smart-open-line)        ;; Open line below
          ))
 
-;(use-package company
-;  :ensure t
-;  :delight
-;  :custom
-;  (company-idle-delay 0.0)
-;  (company-tooltip-idle-delay 0.0)
-;  (setq company-minimum-prefix-length 2)
-;  (setq company-selection-wrap-around t)
-;  (setq company-backends '((company-files company-yasnippet company-capf)))
-;  :hook (prog-mode . company-mode)
-;  :config
-;  (bind-key (kbd "o") 'company-complete 'omni-map))
+(use-package company
+  :ensure t
+  :delight
+  :custom
+  (company-idle-delay 0.0)
+  (company-tooltip-idle-delay 0.0)
+  (setq company-minimum-prefix-length 2)
+  (setq company-selection-wrap-around t)
+  (setq company-backends '((company-files compny-yasnippet company-capf)))
+  :hook (prog-mode . company-mode)
+  :config
+  (bind-key (kbd "o") 'company-complete 'omni-map))
 
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;
