@@ -200,6 +200,62 @@ Each module in the `lisp/` directory handles a specific aspect of the configurat
 - Improved completion with fuzzy matching
 - Which-key popup shows available keybindings after delay
 
+### Tree-sitter Language Support
+
+This configuration includes comprehensive Tree-sitter support for enhanced syntax highlighting, indentation, and code understanding. Pre-configured languages include:
+
+#### General Programming Languages
+- **C/C++**: Systems programming with advanced syntax highlighting
+- **Python**: Complete support for Python development
+- **JavaScript/TypeScript**: Modern web development
+- **Rust**: Memory-safe systems programming
+- **Go**: Cloud-native development
+- **Java**: Enterprise application development
+- **Ruby**: Web applications and scripting
+- **PHP**: Server-side web development
+
+#### Data Science & Analytics
+- **R**: Statistical computing and data analysis
+- **Julia**: High-performance scientific computing
+- **Scala**: Big data processing and functional programming
+- **SQL**: Database queries and management
+
+#### DevOps & Infrastructure
+- **Bash/Shell**: System scripting and automation
+- **YAML**: Configuration files and CI/CD
+- **Dockerfile**: Container definitions
+- **Terraform**: Infrastructure as code
+- **Protocol Buffers**: API definitions
+
+#### Markup & Documentation
+- **Markdown**: Documentation and notes
+- **LaTeX**: Academic and technical documents
+- **HTML/CSS**: Web styling and structure
+- **reStructuredText**: Python documentation
+- **TOML**: Configuration files
+
+#### Specialized Languages
+- **CMake**: Build system configuration
+- **Jupyter**: Interactive notebook support
+
+#### Installing Tree-sitter Grammars
+After initial setup, install language grammars:
+```
+M-x treesit-install-language-grammar
+```
+
+Or install all available grammars at once:
+```
+M-x treesit-install-all-languages
+```
+
+#### Compatibility Notes (Emacs 29.3)
+- **Working parsers**: C++, CSS, Python, JavaScript, TypeScript, YAML, R, Julia, Scala, Go, Java, JSON, and others
+- **Version compatibility issues**: Some parsers (bash, c, rust) may have version mismatches with Emacs 29.3
+- **Troubleshooting**: Use `M-x treesit-check-parsers` to see parser status
+
+The configuration automatically remaps major modes to their Tree-sitter equivalents where available.
+
 ## Requirements
 
 - GNU Emacs 27.1 or later
@@ -207,6 +263,12 @@ Each module in the `lisp/` directory handles a specific aspect of the configurat
 - Font support for icons (automatically installed via `nerd-icons-install-fonts`)
 - Optional: `ripgrep` for fast project-wide searching
 - Optional: `fd` for enhanced file finding (used by dirvish for large directories)
+
+### Python Development
+For full Python development features, see **[PYTHON_SETUP.md](PYTHON_SETUP.md)** for detailed installation instructions:
+- **Ruff**: Fast linter and formatter
+- **Python LSP Server (pylsp)**: Language server for completions and navigation
+- **Flymake**: Built-in diagnostics integration
 
 ## Troubleshooting
 

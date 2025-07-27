@@ -56,6 +56,7 @@ tree-sitter/
 # Other temporary directories
 tmp/
 temp/
+lisp/lsp-fixed.el
 
 # Place files
 places

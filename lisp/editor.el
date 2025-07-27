@@ -91,7 +91,7 @@
   :ensure t
   :hook (eldoc-mode . eldoc-box-hover-at-point-mode) ;; Enable eldoc-box in eldoc mode
   :config
-  (setq eldoc-box-border-color "black"))  ;; Set the border color (optional)
+  (setq eldoc-box-border-color "black"))
 
 
 ;;;;;;;;;;;;;;;;;;
