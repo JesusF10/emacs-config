@@ -93,15 +93,6 @@
   :ensure t
   :hook (prog-mode . rainbow-delimiters-mode))
 
-;; Highlight indentation guides
-(use-package highlight-indent-guides
-  :ensure t
-  :hook (prog-mode . highlight-indent-guides-mode)
-  :custom
-  (highlight-indent-guides-method 'character)
-  (highlight-indent-guides-character ?│)
-  (highlight-indent-guides-responsive 'top))
-
 
 ;;;;;;;;;;;;;;;;;
 ;; Color Codes ;;

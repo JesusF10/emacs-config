@@ -239,18 +239,45 @@
          ("C-o" . crux-smart-open-line)        ;; Open line below
          ))
 
-(use-package company
+;(use-package company
+;  :ensure t
+;  :delight
+;  :custom
+;  (company-idle-delay 0.0)
+;  (company-tooltip-idle-delay 0.0)
+;  (setq company-minimum-prefix-length 2)
+;  (setq company-selection-wrap-around t)
+;  (setq company-backends '((company-files compny-yasnippet company-capf)))
+;  :hook (prog-mode . company-mode)
+;  :config
+                                        ;  (bind-key (kbd "o") 'company-complete 'omni-map))
+
+;; Corfu: minimal and native popup completion
+(use-package corfu
   :ensure t
-  :delight
+  :init
+  (global-corfu-mode)
   :custom
-  (company-idle-delay 0.0)
-  (company-tooltip-idle-delay 0.0)
-  (setq company-minimum-prefix-length 2)
-  (setq company-selection-wrap-around t)
-  (setq company-backends '((company-files compny-yasnippet company-capf)))
-  :hook (prog-mode . company-mode)
-  :config
-  (bind-key (kbd "o") 'company-complete 'omni-map))
+  (corfu-auto t)                     ; Auto popup completions
+  (corfu-auto-delay 0.2)             ; Delay before showing
+  (corfu-cycle t)                    ; Cycle through candidates
+  (corfu-preview-current nil)
+  (corfu-quit-no-match 'separator)
+  :bind (:map corfu-map
+              ("M-SPC" . corfu-insert-separator))) ; Optional: insert ":"
+
+;; Cape: extra completion sources
+(use-package cape
+  :ensure t
+  :init
+  ;; Useful completion sources
+  (add-to-list 'completion-at-point-functions #'cape-dabbrev) ; buffer words
+  (add-to-list 'completion-at-point-functions #'cape-file)    ; file paths
+  (add-to-list 'completion-at-point-functions #'cape-elisp-symbol) ; Elisp symbol
+  (add-to-list 'completion-at-point-functions #'cape-keyword) ; keyword symbols
+  (add-to-list 'completion-at-point-functions #'cape-tex) ;; Latex symbols
+  ;; Add more if needed: cape-keyword, cape-tex, cape-symbol, etc.
+  )
 
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;

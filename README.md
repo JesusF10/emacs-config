@@ -1,6 +1,6 @@
 # Emacs Configuration
 
-A clean, modular Emacs configuration using the [Elpaca](https://github.com/progfolio/elpaca) package manager.
+A clean, modular Emacs configuration using the [Elpaca](https://github.com/progfolio/elpaca) package manager with enhanced LSP support and Tree-sitter integration.
 
 ## Features
 
@@ -9,8 +9,11 @@ A clean, modular Emacs configuration using the [Elpaca](https://github.com/progf
 - **Performance Optimized**: Startup performance optimizations included
 - **Well Documented**: Each module is documented and easy to understand
 - **Beautiful UI**: Doom themes, modern modeline, and visual enhancements
-- **Enhanced Navigation**: Fuzzy finding, file management, and quick window switching
+- **Enhanced Navigation**: Fuzzy finding with Vertico, Consult, and Dirvish file management
 - **Smart Editing**: Auto-completion, syntax highlighting, and intelligent features
+- **Tree-sitter Support**: Modern syntax highlighting and parsing for 20+ languages
+- **LSP Integration**: Language Server Protocol support with Eglot for Python (Pyright) and Ruff formatting
+- **Virtual Environment Detection**: Automatic Python virtual environment discovery and activation
 
 ## Structure
 
@@ -21,11 +24,12 @@ A clean, modular Emacs configuration using the [Elpaca](https://github.com/progf
 ├── lisp/                # Configuration modules
 │   ├── packages.el      # Package management (Elpaca setup)
 │   ├── ui.el            # UI and appearance settings
-│   ├── editor.el        # Editor enhancements
+│   ├── editor.el        # Editor enhancements and completion
 │   ├── keybindings.el   # Custom keybindings
-│   ├── lsp.el           # LSP and programming support
+│   ├── lsp.el           # LSP, Tree-sitter, and Python development
 │   ├── org-mode.el      # Org-mode configuration
 │   └── utils.el         # Utility functions
+├── PYTHON_SETUP.md      # Python development setup guide
 └── README.md            # This file
 ```
 
@@ -67,7 +71,16 @@ A clean, modular Emacs configuration using the [Elpaca](https://github.com/progf
    
    After installing fonts, restart Emacs to see icons properly displayed.
 
-## Packages
+5. **Python Development Setup** (optional):
+   ```bash
+   # Install Python LSP tools globally
+   npm install -g pyright
+   
+   # Or install in your project virtual environment
+   pip install python-lsp-server ruff
+   ```
+
+## Current Package Configuration
 
 This configuration includes the following packages, organized by functionality:
 
@@ -76,38 +89,27 @@ This configuration includes the following packages, organized by functionality:
 - **[elpaca-use-package](https://github.com/progfolio/elpaca)**: Integration between Elpaca and use-package syntax
 
 ### UI and Appearance
-- **[doom-themes](https://github.com/doomemacs/themes)**: Collection of beautiful themes (using Doom One)
+- **[doom-themes](https://github.com/doomemacs/themes)**: Collection of beautiful themes (using Doom Palenight)
 - **[nerd-icons](https://github.com/rainstormstudio/nerd-icons.el)**: Modern icon fonts and utilities for displaying file type icons
-- **[doom-modeline](https://github.com/seagle0128/doom-modeline)**: Modern, beautiful modeline with rich information display
 - **[rainbow-delimiters](https://github.com/Fanael/rainbow-delimiters)**: Color-coded parentheses, brackets, and braces
-- **[highlight-indent-guides](https://github.com/DarthFennec/highlight-indent-guides)**: Visual indentation guides
-- **[rainbow-mode](https://github.com/emacs-mirror/rainbow-mode)**: Display colors for color codes (CSS, HTML)
-- **[beacon](https://github.com/Malabarba/beacon)**: Highlight cursor position when scrolling
-- **[smooth-scrolling](https://github.com/aspiers/smooth-scrolling)**: Better, more fluid scrolling experience
 
 ### Completion and Navigation
 - **[vertico](https://github.com/minad/vertico)**: Performant and minimalistic vertical completion UI
 - **[orderless](https://github.com/oantolin/orderless)**: Fuzzy completion style allowing flexible matching
 - **[marginalia](https://github.com/minad/marginalia)**: Rich annotations in the minibuffer for better context
+- **[consult](https://github.com/minad/consult)**: Enhanced search and navigation commands
 
 ### File Management
 - **[dirvish](https://github.com/alexluigit/dirvish)**: Modern file manager replacing dired with enhanced visuals and features
-- **dired**: Built-in Emacs directory editor (enhanced by dirvish)
 
 ### Editor Enhancements
 - **[which-key](https://github.com/justbur/emacs-which-key)**: Display available keybindings in popup for better discoverability
-- **Enhanced Built-in Features**: Improved backup system, auto-revert, electric pairs, and more
 
-### Window and Navigation Management
-- **[ace-window](https://github.com/abo-abo/ace-window)**: Quick window switching with visual overlays
-- **winner-mode**: Undo/redo window layout changes
-- **windmove**: Navigate between windows with directional keys
-
-### Development Tools (Optional/Template)
-These packages are included as commented templates in `lsp.el`:
-- **[lsp-mode](https://github.com/emacs-lsp/lsp-mode)**: Language Server Protocol client for intelligent code features
-- **[lsp-ui](https://github.com/emacs-lsp/lsp-ui)**: UI enhancements for lsp-mode
-- **[company](https://github.com/company-mode/company-mode)**: Text completion framework
+### Language Support and Development
+- **Eglot**: Built-in LSP client for intelligent code features (configured for Python with Pyright)
+- **Tree-sitter**: Built-in syntax parsing and highlighting for 20+ languages
+- **Ruff Integration**: Python formatting and linting support
+- **Virtual Environment Detection**: Automatic Python venv activation
 
 ### Built-in Emacs Features Enhanced
 - **Electric Pair Mode**: Automatic bracket/quote pairing
@@ -119,22 +121,59 @@ These packages are included as commented templates in `lsp.el`:
 - **Auto Revert Mode**: Automatically reload files changed externally
 - **Delete Selection Mode**: Replace selected text when typing
 - **Uniquify**: Better buffer names for files with same name
-- **Winner Mode**: Undo/redo window configurations
-- **Windmove**: Navigate between windows with arrow keys
 
 ## Customization
 
 Each module in the `lisp/` directory handles a specific aspect of the configuration:
 
-- **packages.el**: Add new packages here using `use-package` syntax
-- **ui.el**: Customize themes, fonts, and visual appearance
-- **editor.el**: Configure editing behavior and text manipulation
-- **keybindings.el**: Add custom keybindings
-- **lsp.el**: Configure language servers and programming language support
-- **org-mode.el**: Customize Org-mode settings
-- **utils.el**: Add utility functions and miscellaneous settings
+- **packages.el**: Elpaca package manager setup and use-package integration
+- **ui.el**: Themes (Doom Palenight), fonts (JetBrains Mono/Fira Code), icons, and visual appearance
+- **editor.el**: Completion framework (Vertico/Consult/Marginalia), file management (Dirvish), and editing behavior
+- **keybindings.el**: Custom keybindings and key mappings
+- **lsp.el**: Language servers (Eglot+Pyright), Tree-sitter parsers, Ruff integration, and Python development
+- **org-mode.el**: Org-mode configuration and settings
+- **utils.el**: Utility functions and miscellaneous settings
 
 ## Key Features
+
+### Language Server Protocol (LSP) Support
+- **Eglot**: Built-in LSP client for modern language features
+- **Pyright**: TypeScript-based Python language server for completions, diagnostics, and navigation
+- **Ruff Integration**: Fast Python linter and formatter with manual formatting commands
+- **Virtual Environment Detection**: Automatically detects and activates `.venv` in project directories
+- **Flymake Integration**: Real-time error checking and diagnostics
+
+### Tree-sitter Language Support
+Pre-configured for enhanced syntax highlighting and parsing:
+
+#### Core Programming Languages
+- **Python**: Full development support with LSP and Tree-sitter
+- **JavaScript/TypeScript**: Modern web development with TSX support
+- **C/C++**: Systems programming
+- **Go**: Cloud-native development
+- **Java**: Enterprise applications
+- **Rust**: Memory-safe systems programming (commented due to version issues)
+
+#### Data Science & Analytics
+- **R**: Statistical computing and data analysis
+- **Julia**: High-performance scientific computing
+- **Scala**: Big data processing with Apache Spark
+
+#### Web Development
+- **HTML/CSS**: Frontend development
+- **JSON**: Configuration and data files
+
+#### DevOps & Infrastructure
+- **YAML**: Configuration files and CI/CD
+- **HCL/Terraform**: Infrastructure as code
+- **Dockerfile**: Container definitions
+- **Protocol Buffers**: API definitions
+
+#### Documentation & Markup
+- **Markdown**: Documentation and notes
+- **LaTeX**: Academic documents
+- **Org**: Emacs org-mode files
+- **reStructuredText**: Python documentation
 
 ### Package Management
 - Uses Elpaca for modern, fast package management
@@ -142,14 +181,18 @@ Each module in the `lisp/` directory handles a specific aspect of the configurat
 - Automatic package installation on startup
 
 ### UI Improvements
-- Beautiful Doom themes with modern color schemes
+- Beautiful Doom Palenight theme with modern color schemes
 - Rich icon support with nerd-icons
 - Rainbow-colored brackets and delimiters for better code readability
-- Visual indentation guides
-- Modern modeline with git status, file info, and project context
-- Smooth scrolling and cursor highlighting
 - Clean, minimal interface
 - Smart font selection (JetBrains Mono → Fira Code → Source Code Pro → Consolas)
+
+### Enhanced Completion and Navigation
+- **Vertico**: Vertical completion interface with fuzzy matching
+- **Consult**: Enhanced search commands (consult-line, consult-git-grep)
+- **Marginalia**: Rich annotations in minibuffer
+- **Orderless**: Flexible completion matching
+- **Dirvish**: Modern file manager with enhanced visuals
 
 ### Editor Enhancements
 - Modern completion with fuzzy matching
@@ -159,16 +202,71 @@ Each module in the `lisp/` directory handles a specific aspect of the configurat
 - Recent files tracking with quick access
 - Auto-revert mode for file changes
 - Smart window management and navigation
+- Which-key for discoverable keybindings
+
+### Python Development Features
+- **LSP Support**: Full language server integration with Pyright
+- **Ruff Integration**: Fast linting and formatting
+- **Virtual Environment**: Automatic detection and activation
+- **Tree-sitter**: Enhanced syntax highlighting
+- **Flymake**: Real-time diagnostics and error checking
+
+#### Python LSP Keybindings (via `lsp-map` prefix)
+- `s`: Start Eglot LSP server
+- `r`: Rename symbol
+- `a`: Code actions
+- `f`: Format buffer
+- `R`: Reconnect to server
+- `S`: Shutdown server
+
+#### Debugging and Diagnostics
+- `d e`: Show Eglot events buffer
+- `d l`: Show LSP stderr buffer
+- `d b`: Check Flymake backends
+- `d r`: Reset Flymake backends
+
+#### Error Navigation
+- `e e`: Show project diagnostics
+- `e n`: Go to next error
+- `e p`: Go to previous error
+- `e l`: Show buffer diagnostics
+- `e r`: Show running backends
+
+#### Manual Ruff Commands
+- `C-c l F`: Format buffer with Ruff
+- `C-c l L`: Check buffer with Ruff
 
 ### Keybindings
 
-#### Configuration Management
-- `C-c e r`: Restart emacs
-- `C-c e R`: Reload configuration file
-- `C-c e i`: Open configuration file
-- `C-c e u`: Upgrade all installed packages
+#### LSP and Python Development
+All LSP commands are available through the `lsp-map` prefix:
 
-#### File and Buffer Navigation
+**Core LSP Commands:**
+- `s`: Start Eglot LSP server
+- `r`: Rename symbol  
+- `a`: Code actions
+- `f`: Format buffer
+- `R`: Reconnect to server
+- `S`: Shutdown server
+
+**Debugging and Troubleshooting:**
+- `d e`: Show Eglot events buffer
+- `d l`: Show LSP stderr buffer  
+- `d b`: Check Flymake backends
+- `d r`: Reset Flymake backends
+
+**Error Navigation:**
+- `e e`: Show project diagnostics
+- `e n`: Go to next error
+- `e p`: Go to previous error
+- `e l`: Show buffer diagnostics
+- `e r`: Show running backends
+
+**Manual Ruff Commands:**
+- `C-c l F`: Format buffer with Ruff
+- `C-c l L`: Check buffer with Ruff
+
+#### File and Buffer Navigation  
 - `C-c C-f`: Traditional find-file
 - `C-c F`: Find file in other window
 
@@ -176,67 +274,28 @@ Each module in the `lisp/` directory handles a specific aspect of the configurat
 - `C-c v f`: Open dirvish file manager
 - `C-c v s`: Open dirvish in side panel
 
-#### Dirvish Navigation (when active `dirvish-mode-map`)
+#### Dirvish Navigation (when active)
 - `j/k`: Move down/up
 - `h/l`: Go to parent directory/enter directory
 - `q`: Quit dirvish
 - `?`: Show help menu
 
-#### Window and Navigation Management
-- `Shift <left>`: Move to left window
-- `Shift <right>': Move to right window
-- `Shift <up>': Move to upper window
-- `Shift <down>': Move to bottom window
+#### Completion and Search (Consult)
+- `C-c l`: Search line in current buffer (consult-line)
+- `C-c G`: Git grep in project (consult-git-grep)
 
-#### Visual and UI Features
-- Rainbow delimiters: Automatic color-coding of brackets
-- Indent guides: Visual indentation lines in programming modes
-- Beacon: Cursor highlighting when scrolling
-- Color display: See actual colors for CSS/HTML color codes
+#### Configuration Management
+- `C-c e r`: Restart emacs
+- `C-c e R`: Reload configuration file
+- `C-c e i`: Open configuration file
+- `C-c e u`: Upgrade all installed packages
 
-#### Other Enhancements
-- Smart font selection based on availability
-- Enhanced backup system with version control
-- Improved completion with fuzzy matching
-- Which-key popup shows available keybindings after delay
+#### Tree-sitter Management
+- `M-x treesit-install-all-languages`: Install all available parsers
+- `M-x treesit-check-parsers`: Check parser status
+- `M-x treesit-clean-and-reinstall`: Reinstall problematic parser
 
 ### Tree-sitter Language Support
-
-This configuration includes comprehensive Tree-sitter support for enhanced syntax highlighting, indentation, and code understanding. Pre-configured languages include:
-
-#### General Programming Languages
-- **C/C++**: Systems programming with advanced syntax highlighting
-- **Python**: Complete support for Python development
-- **JavaScript/TypeScript**: Modern web development
-- **Rust**: Memory-safe systems programming
-- **Go**: Cloud-native development
-- **Java**: Enterprise application development
-- **Ruby**: Web applications and scripting
-- **PHP**: Server-side web development
-
-#### Data Science & Analytics
-- **R**: Statistical computing and data analysis
-- **Julia**: High-performance scientific computing
-- **Scala**: Big data processing and functional programming
-- **SQL**: Database queries and management
-
-#### DevOps & Infrastructure
-- **Bash/Shell**: System scripting and automation
-- **YAML**: Configuration files and CI/CD
-- **Dockerfile**: Container definitions
-- **Terraform**: Infrastructure as code
-- **Protocol Buffers**: API definitions
-
-#### Markup & Documentation
-- **Markdown**: Documentation and notes
-- **LaTeX**: Academic and technical documents
-- **HTML/CSS**: Web styling and structure
-- **reStructuredText**: Python documentation
-- **TOML**: Configuration files
-
-#### Specialized Languages
-- **CMake**: Build system configuration
-- **Jupyter**: Interactive notebook support
 
 #### Installing Tree-sitter Grammars
 After initial setup, install language grammars:
@@ -249,26 +308,51 @@ Or install all available grammars at once:
 M-x treesit-install-all-languages
 ```
 
+#### Utility Functions
+- `M-x treesit-check-parsers`: Check status of installed parsers
+- `M-x treesit-clean-and-reinstall`: Reinstall problematic parsers
+
 #### Compatibility Notes (Emacs 29.3)
-- **Working parsers**: C++, CSS, Python, JavaScript, TypeScript, YAML, R, Julia, Scala, Go, Java, JSON, and others
+- **Working parsers**: C++, CSS, Python, JavaScript, TypeScript, YAML, R, Julia, Scala, Go, Java, JSON, HTML, Markdown, TOML, LaTeX, Org
+- **Infrastructure**: HCL/Terraform, Nix, Protocol Buffers, reStructuredText  
 - **Version compatibility issues**: Some parsers (bash, c, rust) may have version mismatches with Emacs 29.3
-- **Troubleshooting**: Use `M-x treesit-check-parsers` to see parser status
 
 The configuration automatically remaps major modes to their Tree-sitter equivalents where available.
 
 ## Requirements
 
-- GNU Emacs 27.1 or later
+- GNU Emacs 27.1 or later (29.3+ recommended for full Tree-sitter support)
 - Git (for package installation)
 - Font support for icons (automatically installed via `nerd-icons-install-fonts`)
-- Optional: `ripgrep` for fast project-wide searching
-- Optional: `fd` for enhanced file finding (used by dirvish for large directories)
 
-### Python Development
+### Optional Dependencies
+- **ripgrep**: Fast project-wide searching (used by Consult)
+- **fd**: Enhanced file finding (used by Dirvish for large directories)
+
+### Python Development Requirements
 For full Python development features, see **[PYTHON_SETUP.md](PYTHON_SETUP.md)** for detailed installation instructions:
-- **Ruff**: Fast linter and formatter
-- **Python LSP Server (pylsp)**: Language server for completions and navigation
-- **Flymake**: Built-in diagnostics integration
+
+#### Global Installation (Recommended)
+```bash
+# Install Pyright globally
+npm install -g pyright
+
+# Optional: Install Python tools globally
+pip install ruff python-lsp-server
+```
+
+#### Virtual Environment Installation
+```bash
+# In your project directory
+python -m venv .venv
+source .venv/bin/activate  # Linux/Mac
+# .venv\Scripts\activate  # Windows
+
+# Install Python development tools
+pip install ruff python-lsp-server
+```
+
+The configuration automatically detects and activates `.venv` directories in your project root.
 
 ## Troubleshooting
 
@@ -292,9 +376,49 @@ If you see square boxes or strange characters instead of icons:
    fc-cache -f -v
    ```
 
+### Python LSP Issues
+If you encounter LSP connection problems:
+
+1. **Check Python tools availability**:
+   ```bash
+   which pyright-langserver  # Should return a path
+   which ruff                # Should return a path
+   ```
+
+2. **Virtual environment issues**:
+   - Ensure you start Emacs from an activated virtual environment, or
+   - Place a `.venv` directory in your project root
+   - The configuration automatically detects `.venv` directories
+
+3. **LSP server crashes**: 
+   - Check `*eglot stderr*` buffer for error messages
+   - Use `M-x eglot-reconnect` to restart the server
+   - Use `M-x eglot-shutdown` then `M-x eglot` to fully restart
+
+4. **pyright not found error**:
+   ```bash
+   # Install globally
+   npm install -g pyright
+   ```
+
+### Tree-sitter Parser Issues
+If syntax highlighting is broken:
+
+1. **Check parser status**:
+   ```
+   M-x treesit-check-parsers
+   ```
+
+2. **Reinstall problematic parsers**:
+   ```
+   M-x treesit-clean-and-reinstall
+   ```
+
+3. **Version compatibility**: Some parsers may not work with Emacs 29.3. Check the output of `treesit-check-parsers` for errors.
+
 ### Completion Issues
 If you see duplicate completion interfaces:
-- This configuration uses Vertico for completion
+- This configuration uses Vertico + Consult + Marginalia for completion
 - Ensure no conflicting completion systems are active
 - Restart Emacs if switching from other completion setups
 
@@ -303,6 +427,7 @@ If Emacs feels slow:
 - Increase `gc-cons-threshold` in `init.el` (already optimized)
 - Disable heavy visual features temporarily
 - Check for conflicting packages
+- Use `M-x profiler-start` to identify performance bottlenecks
 
 ## Contributing
 

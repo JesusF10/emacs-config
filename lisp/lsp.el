@@ -49,14 +49,6 @@
           (nix . ("https://github.com/cstrahan/tree-sitter-nix"))             ; Reproducible environments
           (proto . ("https://github.com/mitchellh/tree-sitter-proto"))        ; Protocol buffers (TensorFlow, gRPC)
           (rst . ("https://github.com/stsewd/tree-sitter-rst"))               ; reStructuredText documentation
-          
-          ;; Problematic parsers (commented out due to version issues with Emacs 29.3)
-          ;; Uncomment and try these if you want to test them:
-          ;;(bash . ("https://github.com/tree-sitter/tree-sitter-bash"))       ; Version mismatch issue
-          ;;(c . ("https://github.com/tree-sitter/tree-sitter-c"))             ; Version mismatch issue
-          ;;(rust . ("https://github.com/tree-sitter/tree-sitter-rust"))       ; Version mismatch issue
-          ;;(csv . ("https://github.com/tree-sitter-grammars/tree-sitter-csv")) ; Missing src directory
-          ;;(xml . ("https://github.com/tree-sitter-grammars/tree-sitter-xml")) ; Missing src directory
           ))
 
   :config
@@ -149,7 +141,6 @@
   :ensure nil
   :hook (prog-mode . eglot-ensure)
   :config
-  ;; Enhanced Eglot settings
   (setq eglot-autoshutdown t                    ; Shutdown LSP server when last buffer is closed
         eglot-confirm-server-initiated-edits nil ; Don't ask for confirmation on LSP edits
         eglot-extend-to-xref t                  ; Extend LSP to xref functionality
@@ -157,7 +148,8 @@
 
   (add-to-list 'eglot-server-programs
                '((python-mode python-ts-mode) .
-                 ("pylsp")))
+                 ("pyright-langserver" "--stdio")))
+
   
   ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
   ;; Ruff Integration (Formatter, Lint) ;;
@@ -187,11 +179,28 @@
                (executable-find "ruff"))
       (shell-command
        (format "ruff check %s" (shell-quote-argument (buffer-file-name))))))
-
-  ;; Optional: Format before save (if not done by LSP already)
-  (add-hook 'before-save-hook #'my/ruff-format-buffer)
   )
 )
+
+
+;;;;;;;;;;;;;;;;;
+;; Python Envs ;;
+;;;;;;;;;;;;;;;;;
+
+(defun my/detect-python-venv ()
+  "Detect and set Python virtual environment for LSP."
+  (when-let* ((project-root (or (project-root (project-current))
+                                default-directory))
+              (venv-path (expand-file-name ".venv" project-root)))
+    (when (file-directory-p venv-path)
+      (setenv "VIRTUAL_ENV" venv-path)
+      (let ((python-path (expand-file-name "bin/python" venv-path)))
+        (when (file-executable-p python-path)
+          (setenv "PYTHON_PATH" python-path)
+          (message "Detected Python venv: %s" venv-path))))))
+
+(add-hook 'python-mode-hook #'my/detect-python-venv)
+(add-hook 'python-ts-mode-hook #'my/detect-python-venv)
 
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;
