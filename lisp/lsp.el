@@ -22,7 +22,6 @@
           (css . ("https://github.com/tree-sitter/tree-sitter-css"))
           (dockerfile . ("https://github.com/camdencheek/tree-sitter-dockerfile"))
           (elisp . ("https://github.com/Wilfred/tree-sitter-elisp"))
-          (go . ("https://github.com/tree-sitter/tree-sitter-go"))
           (html . ("https://github.com/tree-sitter/tree-sitter-html"))
           (java . ("https://github.com/tree-sitter/tree-sitter-java"))
           (javascript . ("https://github.com/tree-sitter/tree-sitter-javascript"))
@@ -42,13 +41,7 @@
           ;; Data Science Languages (working well)
           (r . ("https://github.com/r-lib/tree-sitter-r"))                    ; Statistics, ggplot2, tidyverse
           (julia . ("https://github.com/tree-sitter/tree-sitter-julia"))      ; High-performance computing, ML.jl
-          (scala . ("https://github.com/tree-sitter/tree-sitter-scala"))      ; Apache Spark, big data
-          
-          ;; Infrastructure & Configuration (working)
-          (hcl . ("https://github.com/MichaHoffmann/tree-sitter-hcl"))         ; HashiCorp Configuration Language (Terraform)
-          (nix . ("https://github.com/cstrahan/tree-sitter-nix"))             ; Reproducible environments
-          (proto . ("https://github.com/mitchellh/tree-sitter-proto"))        ; Protocol buffers (TensorFlow, gRPC)
-          (rst . ("https://github.com/stsewd/tree-sitter-rst"))               ; reStructuredText documentation
+          (scala . ("https://github.com/tree-sitter/tree-sitter-scala"))      ; Apache Spark, big data            ; reStructuredText documentation
           ))
 
   :config
@@ -115,21 +108,12 @@
           (json-mode . json-ts-mode)
           (python-mode . python-ts-mode)
           (typescript-mode . typescript-ts-mode)
-          (go-mode . go-ts-mode)
           (yaml-mode . yaml-ts-mode)
           
           ;; Data Science languages with working parsers
           (r-mode . r-ts-mode)              ; R statistical computing
           (julia-mode . julia-ts-mode)      ; Julia high-performance
           (scala-mode . scala-ts-mode)      ; Scala big data
-          
-          ;; Infrastructure with working parsers
-          (terraform-mode . hcl-ts-mode)    ; Terraform/HCL files
-          
-          ;; Commented out due to version compatibility issues:
-          ;;(c-mode . c-ts-mode)            ; Version mismatch with Emacs 29.3
-          ;;(bash-mode . bash-ts-mode)      ; Version mismatch with Emacs 29.3
-          ;;(rust-mode . rust-ts-mode)      ; Version mismatch with Emacs 29.3
           )))
 
 
@@ -150,6 +134,12 @@
                '((python-mode python-ts-mode) .
                  ("pyright-langserver" "--stdio")))
 
+  ;; JavaScript/TypeScript LSP support (optional)
+  (when (executable-find "typescript-language-server")
+    (add-to-list 'eglot-server-programs
+                 '((js-mode js-ts-mode typescript-mode typescript-ts-mode tsx-ts-mode) .
+                   ("typescript-language-server" "--stdio"))))
+                   
   
   ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
   ;; Ruff Integration (Formatter, Lint) ;;
@@ -203,14 +193,31 @@
 (add-hook 'python-ts-mode-hook #'my/detect-python-venv)
 
 
+;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; Racket Configuration ;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+(use-package paredit
+  :ensure t)
+
+(use-package racket-mode
+  :ensure t
+  :defer t
+  :hook ((racket-mode . paredit-mode))
+  :bind (lsp-map)
+  ())
+
+
 ;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; LSP Helper Bindings ;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;
 
+(define-prefix-command 'flymake-map nil "Flymake")
+(define-key lsp-map (kbd "m") 'flymake-map)
+
 ;; Ruff manual
 (bind-key (kbd "C-c l F") #'my/ruff-format-buffer)
 (bind-key (kbd "C-c l L") #'my/ruff-check-buffer)
-
 
 (bind-key (kbd "s") 'eglot 'lsp-map)
 (bind-key (kbd "r") 'eglot-rename 'lsp-map)
@@ -222,15 +229,15 @@
 ;; Debugging and troubleshooting
 (bind-key (kbd "d e") 'eglot-events-buffer 'lsp-map)
 (bind-key (kbd "d l") 'eglot-stderr-buffer 'lsp-map)
-(bind-key (kbd "d b") 'my/flymake-check-backends 'lsp-map)
-(bind-key (kbd "d r") 'my/flymake-reset-backends 'lsp-map)
+(bind-key (kbd "b") 'my/flymake-check-backends 'flymake-map)
+(bind-key (kbd "R") 'my/flymake-reset-backends 'flymake-map)
 
 ;; Flymake diagnostic keybindings
-(bind-key (kbd "e e") 'flymake-show-project-diagnostics 'lsp-map)
-(bind-key (kbd "e n") 'flymake-goto-next-error 'lsp-map)
-(bind-key (kbd "e p") 'flymake-goto-prev-error 'lsp-map)
-(bind-key (kbd "e l") 'flymake-show-buffer-diagnostics 'lsp-map)
-(bind-key (kbd "e r") 'flymake-running-backends 'lsp-map)
+(bind-key (kbd "e") 'flymake-show-project-diagnostics 'flymake-map)
+(bind-key (kbd "n") 'flymake-goto-next-error 'flymake-map)
+(bind-key (kbd "p") 'flymake-goto-prev-error 'flymake-map)
+(bind-key (kbd "l") 'flymake-show-buffer-diagnostics 'flymake-map)
+(bind-key (kbd "r") 'flymake-running-backends 'flymake-map)
 
 
 ;;; lsp.el ends here
