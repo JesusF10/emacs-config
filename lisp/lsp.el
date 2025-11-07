@@ -39,9 +39,9 @@
           (yaml . ("https://github.com/ikatyang/tree-sitter-yaml"))
           
           ;; Data Science Languages (working well)
-          (r . ("https://github.com/r-lib/tree-sitter-r"))                    ; Statistics, ggplot2, tidyverse
-          (julia . ("https://github.com/tree-sitter/tree-sitter-julia"))      ; High-performance computing, ML.jl
-          (scala . ("https://github.com/tree-sitter/tree-sitter-scala"))      ; Apache Spark, big data            ; reStructuredText documentation
+          (r . ("https://github.com/r-lib/tree-sitter-r"))
+          (julia . ("https://github.com/tree-sitter/tree-sitter-julia"))
+          (scala . ("https://github.com/tree-sitter/tree-sitter-scala"))
           ))
 
   :config
@@ -200,12 +200,20 @@
 (use-package paredit
   :ensure t)
 
+;; (use-package racket-mode
+;;   :ensure t
+;;   :defer t
+;;   :hook ((racket-mode . paredit-mode)))
 (use-package racket-mode
   :ensure t
-  :defer t
-  :hook ((racket-mode . paredit-mode))
-  :bind (lsp-map)
-  ())
+  :defer t)
+
+
+(setq racket-program "/home/jesusf10/.config/racket/bin/racket")  ;; or /usr/bin/racket
+(setq racket-command "/home/jesusf10/.config/racket/bin/racket")  ;; alias, used in some versions
+(setq racket-raco-program "/home/jesusf10/.config/racket/bin/raco")
+
+(add-to-list 'auto-mode-alist '("\\.scm\\'" . racket-mode))
 
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;

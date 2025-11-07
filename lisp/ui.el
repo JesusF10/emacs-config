@@ -51,7 +51,7 @@
   ;; for treemacs users
   ;; (doom-themes-treemacs-theme "doom-atom") ; use "doom-colors" for less minimal icon theme
   :config
-  (load-theme 'doom-palenight t)
+  (load-theme 'doom-gruvbox t)
   ;; Enable flashing mode-line on errors
   (doom-themes-visual-bell-config)
   ;; Enable custom neotree theme (nerd-icons must be installed!)
@@ -74,8 +74,8 @@
 (when (display-graphic-p)
   (cond
    ;; Try different fonts in order of preference
-   ((find-font (font-spec :name "JetBrains Mono"))
-    (set-face-attribute 'default nil :font "JetBrains Mono-12"))
+   ;; ((find-font (font-spec :name "JetBrains Mono"))
+   ;;  (set-face-attribute 'default nil :font "JetBrains Mono-12"))
    ((find-font (font-spec :name "Fira Code"))
     (set-face-attribute 'default nil :font "Fira Code-12"))
    ((find-font (font-spec :name "Source Code Pro"))
