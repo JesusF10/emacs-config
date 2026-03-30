@@ -89,6 +89,7 @@
 ;; Use package for eldoc-box
 (use-package eldoc-box
   :ensure t
+  :defer t  ; Load only when eldoc-mode is activated
   :hook (eldoc-mode . eldoc-box-hover-at-point-mode) ;; Enable eldoc-box in eldoc mode
   :config
   (setq eldoc-box-border-color "black"))
@@ -266,6 +267,8 @@
 
 (use-package helpful
   :ensure t
+  :defer t  ; Load only when commands are called
+  :commands (helpful-callable helpful-variable helpful-key helpful-at-point helpful-function helpful-command)
   :bind (:map global-map
               ("C-h f" . helpful-callable)
               ("C-h v" . helpful-variable)

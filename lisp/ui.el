@@ -51,7 +51,7 @@
   ;; for treemacs users
   ;; (doom-themes-treemacs-theme "doom-atom") ; use "doom-colors" for less minimal icon theme
   :config
-  (load-theme 'doom-gruvbox t)
+  (load-theme 'doom-material-dark t)
   ;; Enable flashing mode-line on errors
   (doom-themes-visual-bell-config)
   ;; Enable custom neotree theme (nerd-icons must be installed!)
@@ -68,7 +68,53 @@
 ;; Font configuration
 (use-package nerd-icons
   :ensure t
-  :if (display-graphic-p))
+  :if (display-graphic-p)
+  :config
+  ;; Install fonts if not already installed
+  ;; Run M-x nerd-icons-install-fonts manually if icons don't show
+  (unless (member "Symbols Nerd Font Mono" (font-family-list))
+    (message "Nerd icons fonts not installed. Run M-x nerd-icons-install-fonts")))
+
+;; Configure Flymake to use better icons in the fringe
+(use-package flymake
+  :ensure nil
+  :config
+  (when (display-graphic-p)
+    ;; Use simple, visible fringe bitmaps for errors/warnings
+    (define-fringe-bitmap 'my/flymake-error-fringe
+      [#b00000000
+       #b00111100
+       #b01111110
+       #b11111111
+       #b11111111
+       #b01111110
+       #b00111100
+       #b00000000])
+    
+    (define-fringe-bitmap 'my/flymake-warning-fringe
+      [#b00011000
+       #b00111100
+       #b00111100
+       #b01111110
+       #b01111110
+       #b11111111
+       #b11111111
+       #b00000000])
+    
+    (define-fringe-bitmap 'my/flymake-note-fringe
+      [#b00000000
+       #b00111100
+       #b01111110
+       #b01111110
+       #b00111100
+       #b00011000
+       #b00011000
+       #b00000000])
+    
+    ;; Apply to flymake
+    (setq flymake-error-bitmap '(my/flymake-error-fringe compilation-error))
+    (setq flymake-warning-bitmap '(my/flymake-warning-fringe compilation-warning))
+    (setq flymake-note-bitmap '(my/flymake-note-fringe compilation-info))))
 
 ;; Better default font (if available)
 (when (display-graphic-p)
@@ -106,6 +152,7 @@
 ;; Beacon - highlight cursor position
 (use-package beacon
   :ensure t
+  :defer 1  ; Load 1 second after startup (purely visual effect)
   :config
   (beacon-mode 1)
   :custom
@@ -146,10 +193,106 @@
 ;; Smooth scrolling
 (use-package smooth-scrolling
   :ensure t
+  :defer 1  ; Load 1 second after startup (visual enhancement)
   :config
   (smooth-scrolling-mode 1)
   :custom
   (smooth-scroll-margin 2))
+
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; Git Integration Visual   ;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+;; Git gutter - show git diff in fringe
+(use-package git-gutter
+  :ensure t
+  :if (display-graphic-p)
+  :defer 2  ; Load 2 seconds after startup (purely visual, not critical)
+  :config
+  (global-git-gutter-mode +1)
+  :custom
+  (git-gutter:update-interval 2)
+  (git-gutter:modified-sign "│")
+  (git-gutter:added-sign "│")
+  (git-gutter:deleted-sign "│")
+  :custom-face
+  (git-gutter:modified ((t (:background "#e5c07b" :foreground "#e5c07b"))))
+  (git-gutter:added ((t (:background "#98c379" :foreground "#98c379"))))
+  (git-gutter:deleted ((t (:background "#e06c75" :foreground "#e06c75")))))
+
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; Indentation Visual Guides ;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+;; Indent guides - show indentation levels
+(use-package indent-guide
+  :ensure t
+  :defer t  ; Load only when prog-mode is activated
+  :hook (prog-mode . indent-guide-mode)
+  :custom
+  (indent-guide-char "│")
+  (indent-guide-delay 0.3)
+  :custom-face
+  (indent-guide-face ((t (:foreground "#3e4451" :slant normal)))))
+
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; Window Transparency       ;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+;; Window transparency (95% active, 90% inactive)
+(when (display-graphic-p)
+  (set-frame-parameter (selected-frame) 'alpha '(95 . 90))
+  (add-to-list 'default-frame-alist '(alpha . (95 . 90))))
+
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; Completion Icons          ;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+;; Nerd icons in completion (Vertico/Consult)
+(use-package nerd-icons-completion
+  :ensure t
+  :defer 1  ; Load 1 second after startup (visual enhancement)
+  :after (marginalia nerd-icons)
+  :config
+  (nerd-icons-completion-mode)
+  (add-hook 'marginalia-mode-hook #'nerd-icons-completion-marginalia-setup))
+
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; Dashboard (Start Screen)  ;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+;; Dashboard - modern startup screen
+(use-package dashboard
+  :ensure t
+  :init
+  ;; Set initial buffer to dashboard
+  (setq initial-buffer-choice (lambda () (get-buffer-create "*dashboard*")))
+  :config
+  (dashboard-setup-startup-hook)
+  :custom
+  (dashboard-banner-logo-title "Data Science Edition - Emacs Config")
+  (dashboard-startup-banner 'logo)
+  (dashboard-center-content t)
+  (dashboard-items '((recents  . 5)
+                     (projects . 5)
+                     (bookmarks . 3)))
+  (dashboard-set-heading-icons t)
+  (dashboard-set-file-icons t)
+  (dashboard-set-navigator t)
+  (dashboard-navigator-buttons
+   `(((,(nerd-icons-faicon "nf-fa-github" :height 1.1 :v-adjust 0.0)
+       "GitHub"
+       "Browse GitHub"
+       (lambda (&rest _) (browse-url "https://github.com/JesusF10/emacs-config")))
+      (,(nerd-icons-faicon "nf-fa-refresh" :height 1.1 :v-adjust 0.0)
+       "Update"
+       "Update packages"
+       (lambda (&rest _) (elpaca-update-all)))))))
 
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;
