@@ -425,81 +425,26 @@
 
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;; Python Debugger (DAP-mode)   ;;
+;; Python Debugger (pdb)        ;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-;; dap-mode: Debug Adapter Protocol support
-(use-package dap-mode
-  :ensure t
-  :defer t
-  :commands (dap-debug dap-debug-last dap-breakpoint-toggle)
-  :after (eglot)
-  :config
-  ;; Enable dap-python (uses debugpy)
-  (require 'dap-python)
-  
-  ;; Debugpy configuration (will use venv's debugpy if available)
-  (setq dap-python-debugger 'debugpy)
-  
-  ;; Auto-configure Python debug templates
-  (defun my/dap-python-setup ()
-    "Setup DAP for Python with sensible defaults."
-    (dap-register-debug-template
-     "Python :: Run Configuration"
-     (list :type "python"
-           :args ""
-           :cwd nil
-           :program nil
-           :request "launch"
-           :name "Python :: Run Configuration"))
-    
-    (dap-register-debug-template
-     "Python :: Run pytest"
-     (list :type "python"
-           :args "-sv"
-           :cwd nil
-           :program nil
-           :module "pytest"
-           :request "launch"
-           :name "Python :: Run pytest")))
-  
-  (my/dap-python-setup)
-  
-  ;; UI configurations
-  (setq dap-auto-configure-features '(sessions locals breakpoints expressions tooltip))
-  
-  ;; Keybindings
-  (define-prefix-command 'python-debug-map nil "Python Debug")
-  :bind (:map python-mode-map
-              ("C-c d" . python-debug-map)
-              ("C-c d d" . dap-debug)
-              ("C-c d l" . dap-debug-last)
-              ("C-c d b" . dap-breakpoint-toggle)
-              ("C-c d n" . dap-next)
-              ("C-c d i" . dap-step-in)
-              ("C-c d o" . dap-step-out)
-              ("C-c d c" . dap-continue)
-              ("C-c d q" . dap-disconnect)
-              ("C-c d e" . dap-eval)
-              ("C-c d r" . dap-eval-region))
-  :bind (:map python-ts-mode-map
-              ("C-c d" . python-debug-map)
-              ("C-c d d" . dap-debug)
-              ("C-c d l" . dap-debug-last)
-              ("C-c d b" . dap-breakpoint-toggle)
-              ("C-c d n" . dap-next)
-              ("C-c d i" . dap-step-in)
-              ("C-c d o" . dap-step-out)
-              ("C-c d c" . dap-continue)
-              ("C-c d q" . dap-disconnect)
-              ("C-c d e" . dap-eval)
-              ("C-c d r" . dap-eval-region)))
-
-;; Enable dap-ui features (part of dap-mode)
-(with-eval-after-load 'dap-mode
-  (dap-ui-mode 1)
-  (dap-tooltip-mode 1)
-  (tooltip-mode 1))
+;; Built-in Python debugger support
+;; Use pdb (Python debugger) - no external dependencies needed
+;; 
+;; Usage:
+;;   1. Add breakpoint in code: import pdb; pdb.set_trace()
+;;   2. Run script: M-x compile RET python script.py
+;;   3. When breakpoint hits, use pdb commands in compilation buffer
+;;
+;; Common pdb commands:
+;;   n (next)      - Execute current line
+;;   s (step)      - Step into function
+;;   c (continue)  - Continue until next breakpoint
+;;   p variable    - Print variable value
+;;   l (list)      - Show current location in code
+;;   q (quit)      - Exit debugger
+;;
+;; For visual debugging with DAP, see PYTHON_ADVANCED.md alternative tools section
 
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;

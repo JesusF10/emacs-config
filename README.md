@@ -242,7 +242,7 @@ This configuration is optimized for professional Python development with **two c
 
 **Testing & Debugging:**
 - Pytest integration (run function/file/all tests)
-- Visual debugger with breakpoints (DAP-mode)
+- Built-in pdb debugger (no dependencies)
 - Step through code, inspect variables, eval expressions
 
 **Performance Optimized:**
@@ -557,10 +557,10 @@ If you encounter LSP connection problems:
    - Run native compilation: `M-x my/native-compile-packages` (one-time, 5-10 min)
 
 7. **Advanced Python features troubleshooting**:
-   - **Debugger not working**: Install `debugpy` in venv: `uv pip install debugpy`
    - **Tests not running**: Install pytest: `uv pip install pytest`
    - **REPL using wrong Python**: Restart with `C-u C-c C-z` or reactivate venv
    - **Code cells not detected**: Ensure cells start with `# %%` (with space)
+   - **Debugger not working**: Use `breakpoint()` or `import pdb; pdb.set_trace()` in code
    - See [PYTHON_ADVANCED.md](PYTHON_ADVANCED.md) for detailed troubleshooting
 
 ### Tree-sitter Parser Issues

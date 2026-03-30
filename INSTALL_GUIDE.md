@@ -12,12 +12,13 @@ The previous commit had issues with pseudo-packages that don't exist in package 
 
 ## New Packages to Install
 
-When you restart Emacs, Elpaca will automatically install these 4 new packages:
+When you restart Emacs, Elpaca will automatically install these 3 new packages:
 
 1. **pyvenv** - Virtual environment management
 2. **code-cells** - Jupyter-like code cells (execute blocks with `# %%`)
 3. **python-pytest** - Pytest integration
-4. **dap-mode** - Visual debugger with breakpoints
+
+**Note:** `dap-mode` was removed to avoid dependency conflicts with `lsp-mode`. Python debugging is available through built-in `pdb` debugger (see PYTHON_ADVANCED.md).
 
 ---
 
@@ -37,7 +38,7 @@ emacs &
 - Elpaca will detect new packages in configuration
 - Automatic installation will start
 - You'll see messages in `*elpaca-log*` buffer
-- Installation takes ~30-60 seconds
+- Installation takes ~20-30 seconds (3 packages)
 
 ### 2. Verify Installation
 
@@ -51,7 +52,6 @@ M-x elpaca-status
 M-: (package-installed-p 'pyvenv) RET       ; should return 't
 M-: (package-installed-p 'code-cells) RET   ; should return 't
 M-: (package-installed-p 'python-pytest) RET ; should return 't
-M-: (package-installed-p 'dap-mode) RET     ; should return 't
 ```
 
 ### 3. Optional: Install Python Dependencies
@@ -62,14 +62,14 @@ For full functionality, install these tools **per-project** (not global):
 cd your-python-project/
 source .venv/bin/activate  # Activate your venv
 
-# For debugging
-uv pip install debugpy
-
 # For IPython REPL (better than standard Python REPL)
 uv pip install ipython
 
 # For testing
 uv pip install pytest
+
+# For better debugging experience (optional)
+uv pip install ipdb  # IPython-enhanced pdb with colors
 ```
 
 ---
@@ -88,7 +88,6 @@ M-x elpaca-try
 M-x elpaca-try RET pyvenv RET
 M-x elpaca-try RET code-cells RET
 M-x elpaca-try RET python-pytest RET
-M-x elpaca-try RET dap-mode RET
 ```
 
 **Solution 3 - Check Elpaca log:**
@@ -146,8 +145,8 @@ To silence them, they're already configured in `init.el`:
 2. **New keybindings available**:
    - `C-c C-z` - Start Python REPL
    - `C-c t t` - Pytest menu
-   - `C-c d b` - Toggle breakpoint
    - `C-c l v a` - Activate venv manually
+   - `breakpoint()` in code - Python debugger (pdb)
 
 3. **Code cells detection** - Files with `# %%` markers will enable code-cells-mode
 
@@ -193,9 +192,18 @@ Once installed:
    - `C-c C-e` to execute cell
 
 3. **Try debugging**:
-   - Set breakpoint with `C-c d b`
-   - Start debugger with `C-c d d`
-   - Step through with `C-c d n`
+   ```python
+   # test_debug.py
+   def buggy_function():
+       breakpoint()  # Execution stops here
+       x = 10 / 0
+   
+   buggy_function()
+   ```
+   
+   - Run: `M-x compile RET python test_debug.py RET`
+   - When debugger stops, type: `p x`, `n`, `c`, `q`
+   - See PYTHON_ADVANCED.md for full pdb guide
 
 4. **Run tests**:
    - Create a test file: `test_example.py`
@@ -210,11 +218,11 @@ Use this to verify everything works:
 
 ```
 □ Emacs starts without errors
-□ *elpaca-log* shows successful package installations
+□ *elpaca-log* shows successful package installations (3 packages)
 □ Open Python file shows [venv:...] in modeline (if .venv exists)
 □ C-c C-z starts Python REPL
 □ C-c t t shows pytest menu (if pytest installed)
-□ C-c d b toggles breakpoint indicator
+□ breakpoint() in Python code stops at pdb debugger
 □ M-x my/native-compile-packages is available
 □ GC threshold is 16MB: M-: gc-cons-threshold returns 16777216
 ```

@@ -7,7 +7,7 @@ This guide covers the advanced Python development features available in your Ema
 2. [Interactive Python REPL](#interactive-python-repl)
 3. [Jupyter-like Workflow (Code Cells)](#jupyter-like-workflow)
 4. [Testing with Pytest](#testing-with-pytest)
-5. [Visual Debugging (DAP)](#visual-debugging)
+5. [Debugging with pdb](#debugging-with-pdb)
 6. [Performance Tips](#performance-tips)
 
 ---
@@ -182,43 +182,70 @@ def test_add_negative():
 
 ---
 
-## Visual Debugging
+## Debugging with pdb
 
 ### Features
-- **Breakpoints** with visual indicators (red dots in fringe)
+- **Built-in Python debugger** (no external dependencies)
 - **Step through code** line by line
 - **Inspect variables** in real-time
 - **Eval expressions** in debug context
-- **Multiple debug sessions** supported
+- **Works with any Python installation**
 
-### Required Setup
+### No Setup Required
 
-Install `debugpy` in your venv:
-```bash
-uv pip install debugpy
+`pdb` is part of Python standard library - it's already installed!
+
+### Usage
+
+**Method 1: Add breakpoint in code**
+```python
+# debug_example.py
+def calculate_average(numbers):
+    import pdb; pdb.set_trace()  # Execution will stop here
+    total = sum(numbers)
+    count = len(numbers)
+    return total / count
+
+data = [10, 20, 30]
+result = calculate_average(data)
 ```
 
-### Keybindings
-- `C-c d b` - Toggle breakpoint at current line
-- `C-c d d` - Start debugging (prompts for config)
-- `C-c d l` - Debug last configuration
-- `C-c d n` - Step over (next line)
-- `C-c d i` - Step into function
-- `C-c d o` - Step out of function
-- `C-c d c` - Continue execution
-- `C-c d q` - Quit/disconnect debugger
-- `C-c d e` - Eval expression in debug context
-- `C-c d r` - Eval selected region
+**Method 2: Run with debugger from start**
+```bash
+python -m pdb your_script.py
+```
 
-### Debugging Workflow
+### Common pdb Commands
+
+In the pdb prompt:
+
+| Command | Description |
+|---------|-------------|
+| `n` (next) | Execute current line, go to next |
+| `s` (step) | Step into function call |
+| `c` (continue) | Continue until next breakpoint |
+| `p variable` | Print variable value |
+| `pp variable` | Pretty-print variable |
+| `l` (list) | Show code around current line |
+| `w` (where) | Show stack trace |
+| `u` (up) | Move up in stack |
+| `d` (down) | Move down in stack |
+| `b 10` | Set breakpoint at line 10 |
+| `cl 1` | Clear breakpoint 1 |
+| `q` (quit) | Exit debugger |
+
+### Debugging Workflow in Emacs
 
 **Example script:**
 ```python
 # debug_example.py
 def calculate_average(numbers):
+    import pdb; pdb.set_trace()
     total = sum(numbers)
     count = len(numbers)
-    return total / count  # Bug: will crash on empty list
+    if count == 0:
+        return 0
+    return total / count
 
 data = [10, 20, 30]
 result = calculate_average(data)
@@ -226,32 +253,80 @@ print(f"Average: {result}")
 
 # Test edge case
 empty = []
-result2 = calculate_average(empty)  # This will crash
+result2 = calculate_average(empty)
 ```
 
-**Debug steps:**
-1. **Set breakpoint** on line 2: position cursor, press `C-c d b`
-2. **Start debugging**: `C-c d d`, select "Python :: Run Configuration"
-3. **Execution stops** at breakpoint
-4. **Inspect** `numbers` variable in *Locals* window
-5. **Step through**: Press `C-c d n` repeatedly
-6. **Evaluate**: Press `C-c d e`, type `count > 0` to check condition
-7. **Continue**: Press `C-c d c` to run until next breakpoint
+**Debug in Emacs:**
+1. Open file in Emacs
+2. Run: `M-x compile RET python debug_example.py RET`
+3. When pdb stops at breakpoint, you see:
+   ```
+   > /path/to/debug_example.py(3)calculate_average()
+   -> total = sum(numbers)
+   (Pdb) 
+   ```
+4. Type commands in compilation buffer:
+   ```
+   (Pdb) p numbers
+   [10, 20, 30]
+   (Pdb) n
+   -> count = len(numbers)
+   (Pdb) p total
+   60
+   (Pdb) c
+   Average: 20.0
+   ```
 
-**UI Layout during debug:**
-- Main window: source code with execution indicator
-- Left panel: local variables and their values
-- Bottom panel: debug console for expressions
-- Breakpoints visible as red dots in fringe
+### Alternative: Python 3.7+ Breakpoint
 
-### Debug Templates
+Modern Python (3.7+) has a better way:
 
-Two built-in templates available:
+```python
+def calculate_average(numbers):
+    breakpoint()  # Cleaner than import pdb; pdb.set_trace()
+    total = sum(numbers)
+    return total / len(numbers)
+```
 
-1. **Python :: Run Configuration** - Debug current script
-2. **Python :: Run pytest** - Debug test functions
+### Pro Tips
 
-Access via `C-c d d` and select template.
+**1. Conditional breakpoints:**
+```python
+if condition:
+    import pdb; pdb.set_trace()
+```
+
+**2. Post-mortem debugging:**
+```python
+import pdb
+try:
+    risky_operation()
+except Exception:
+    pdb.post_mortem()  # Debug after exception
+```
+
+**3. IPython debugger (better pdb):**
+```bash
+# Install in venv
+uv pip install ipdb
+
+# Use in code
+import ipdb; ipdb.set_trace()  # Colored output, tab completion
+```
+
+### Visual Debugging Alternatives
+
+For a GUI debugging experience similar to VS Code/PyCharm, consider:
+
+**Option 1: realgud (Emacs package)**
+- Graphical debugger interface
+- Works with pdb, gdb, lldb
+- Install: `M-x elpaca-try RET realgud RET`
+
+**Option 2: External debugger**
+- VS Code with Remote SSH
+- PyCharm Community Edition
+- pudb (terminal UI debugger): `uv pip install pudb`
 
 ---
 
@@ -348,23 +423,14 @@ Create `.dir-locals.el` in project root:
 ### Debugging
 | Keybinding | Action |
 |------------|--------|
-| `C-c d b` | Toggle breakpoint |
-| `C-c d d` | Start debug |
-| `C-c d n` | Step over |
-| `C-c d i` | Step into |
-| `C-c d o` | Step out |
-| `C-c d c` | Continue |
-| `C-c d q` | Quit debugger |
-| `C-c d e` | Eval expression |
+| Built-in pdb | Use in code/terminal |
+| `import pdb; pdb.set_trace()` | Set breakpoint |
+| `breakpoint()` | Python 3.7+ breakpoint |
+| `M-x compile RET python -m pdb script.py` | Debug from Emacs |
 
 ---
 
 ## Troubleshooting
-
-### "debugpy not found"
-```bash
-uv pip install debugpy
-```
 
 ### "IPython not found" (using standard Python REPL)
 ```bash
@@ -376,10 +442,10 @@ uv pip install ipython
 uv pip install pytest
 ```
 
-### Breakpoints not working
-1. Ensure `debugpy` is installed in active venv
-2. Check venv is activated: look for `[venv:...]` in modeline
-3. Restart Emacs if venv was just created
+### pdb not stopping at breakpoints
+1. Ensure you're running script (not importing module)
+2. Use `python -m pdb script.py` to start with debugger
+3. Check breakpoint syntax: `import pdb; pdb.set_trace()` or `breakpoint()`
 
 ### REPL not using venv Python
 1. Verify venv activation: `M-x pyvenv-activate`
