@@ -63,3 +63,6 @@ places
 
 # Transient files
 transient/
+
+# Documentation (internal context)
+CONTEXT.md
