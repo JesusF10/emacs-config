@@ -537,93 +537,93 @@ Only cell menu (C-c %) kept for direct access."
 
 ;; Load immediately (not deferred) to ensure availability
 (require 'transient)
+
+;; Wrapper functions to handle optional packages gracefully
+(defun my/python-commander-cells-forward ()
+  "Forward cell if code-cells-mode is active."
+  (interactive)
+  (if (and (fboundp 'code-cells-forward-cell) (bound-and-true-p code-cells-mode))
+      (call-interactively 'code-cells-forward-cell)
+    (message "code-cells-mode not active. Enable it with M-x code-cells-mode")))
+
+(defun my/python-commander-cells-backward ()
+  "Backward cell if code-cells-mode is active."
+  (interactive)
+  (if (and (fboundp 'code-cells-backward-cell) (bound-and-true-p code-cells-mode))
+      (call-interactively 'code-cells-backward-cell)
+    (message "code-cells-mode not active. Enable it with M-x code-cells-mode")))
+
+(defun my/python-commander-cells-eval ()
+  "Eval cell if code-cells-mode is active."
+  (interactive)
+  (if (and (fboundp 'code-cells-eval) (bound-and-true-p code-cells-mode))
+      (call-interactively 'code-cells-eval)
+    (message "code-cells-mode not active. Enable it with M-x code-cells-mode")))
+
+(defun my/python-commander-cells-mark ()
+  "Mark cell if code-cells-mode is active."
+  (interactive)
+  (if (and (fboundp 'code-cells-mark-cell) (bound-and-true-p code-cells-mode))
+      (call-interactively 'code-cells-mark-cell)
+    (message "code-cells-mode not active. Enable it with M-x code-cells-mode")))
+
+(defun my/python-commander-cells-menu ()
+  "Open cell menu if code-cells-mode is active."
+  (interactive)
+  (if (and (fboundp 'code-cells-command) (bound-and-true-p code-cells-mode))
+      (call-interactively 'code-cells-command)
+    (message "code-cells-mode not active. Enable it with M-x code-cells-mode")))
+
+(defun my/python-commander-cells-eval-above ()
+  "Eval cells above if code-cells-mode is active."
+  (interactive)
+  (if (and (fboundp 'code-cells-eval-above) (bound-and-true-p code-cells-mode))
+      (call-interactively 'code-cells-eval-above)
+    (message "code-cells-mode not active. Enable it with M-x code-cells-mode")))
+
+(transient-define-prefix python-commander ()
+  "Python Development Commander - Unified command hub for Python workflows."
+  :info-manual "(python)"
+  ["Python Commander"
+   ["🔄 REPL"
+    ("z" "Switch to REPL" python-shell-switch-to-shell)
+    ("c" "Send buffer" my/python-shell-send-buffer-and-show)
+    ("r" "Send region" my/python-shell-send-and-show)
+    ("d" "Send function" my/python-shell-send-defun-and-show)
+    ("l" "Send file" python-shell-send-file)]
+   
+   ["📦 Cells"
+    ("n" "Next cell" my/python-commander-cells-forward)
+    ("p" "Previous cell" my/python-commander-cells-backward)
+    ("e" "Eval cell" my/python-commander-cells-eval)
+    ("m" "Mark cell" my/python-commander-cells-mark)
+    ("%" "Cell menu" my/python-commander-cells-menu)
+    ("a" "Eval above" my/python-commander-cells-eval-above)]
+   
+   ["🧪 Tests"
+    ("t" "Test dispatch" python-pytest-dispatch :if (lambda () (fboundp 'python-pytest-dispatch)))
+    ("f" "Test function" python-pytest-function :if (lambda () (fboundp 'python-pytest-function)))
+    ("F" "Test file" python-pytest-file :if (lambda () (fboundp 'python-pytest-file)))
+    ("T" "Test all" python-pytest :if (lambda () (fboundp 'python-pytest)))
+    ("L" "Test last failed" python-pytest-last-failed :if (lambda () (fboundp 'python-pytest-last-failed)))]
+   
+   ["🔧 Tools"
+    ("R" "Ruff format" my/ruff-format-buffer :if (lambda () (executable-find "ruff")))
+    ("C" "Ruff check" my/ruff-check-buffer :if (lambda () (executable-find "ruff")))
+    ("v" "Activate venv" pyvenv-activate :if (lambda () (fboundp 'pyvenv-activate)))
+    ("V" "Deactivate venv" pyvenv-deactivate :if (lambda () (fboundp 'pyvenv-deactivate)))
+    ("D" "Detect env" my/detect-python-env :if (lambda () (fboundp 'my/detect-python-env)))]
+   
+   ["📚 LSP"
+    :if (lambda () (bound-and-true-p eglot--managed-mode))
+    ("g" "Go to definition" xref-find-definitions)
+    ("h" "Hover docs" eldoc)
+    ("R" "Rename" eglot-rename)
+    ("A" "Code actions" eglot-code-actions)
+    ("=" "Format" eglot-format)]]
   
-  ;; Wrapper functions to handle optional packages gracefully
-  (defun my/python-commander-cells-forward ()
-    "Forward cell if code-cells-mode is active."
-    (interactive)
-    (if (and (fboundp 'code-cells-forward-cell) (bound-and-true-p code-cells-mode))
-        (call-interactively 'code-cells-forward-cell)
-      (message "code-cells-mode not active. Enable it with M-x code-cells-mode")))
-  
-  (defun my/python-commander-cells-backward ()
-    "Backward cell if code-cells-mode is active."
-    (interactive)
-    (if (and (fboundp 'code-cells-backward-cell) (bound-and-true-p code-cells-mode))
-        (call-interactively 'code-cells-backward-cell)
-      (message "code-cells-mode not active. Enable it with M-x code-cells-mode")))
-  
-  (defun my/python-commander-cells-eval ()
-    "Eval cell if code-cells-mode is active."
-    (interactive)
-    (if (and (fboundp 'code-cells-eval) (bound-and-true-p code-cells-mode))
-        (call-interactively 'code-cells-eval)
-      (message "code-cells-mode not active. Enable it with M-x code-cells-mode")))
-  
-  (defun my/python-commander-cells-mark ()
-    "Mark cell if code-cells-mode is active."
-    (interactive)
-    (if (and (fboundp 'code-cells-mark-cell) (bound-and-true-p code-cells-mode))
-        (call-interactively 'code-cells-mark-cell)
-      (message "code-cells-mode not active. Enable it with M-x code-cells-mode")))
-  
-  (defun my/python-commander-cells-menu ()
-    "Open cell menu if code-cells-mode is active."
-    (interactive)
-    (if (and (fboundp 'code-cells-command) (bound-and-true-p code-cells-mode))
-        (call-interactively 'code-cells-command)
-      (message "code-cells-mode not active. Enable it with M-x code-cells-mode")))
-  
-  (defun my/python-commander-cells-eval-above ()
-    "Eval cells above if code-cells-mode is active."
-    (interactive)
-    (if (and (fboundp 'code-cells-eval-above) (bound-and-true-p code-cells-mode))
-        (call-interactively 'code-cells-eval-above)
-      (message "code-cells-mode not active. Enable it with M-x code-cells-mode")))
-  
-  (transient-define-prefix python-commander ()
-    "Python Development Commander - Unified command hub for Python workflows."
-    :info-manual "(python)"
-    ["Python Commander"
-     ["🔄 REPL"
-      ("z" "Switch to REPL" python-shell-switch-to-shell)
-      ("c" "Send buffer" my/python-shell-send-buffer-and-show)
-      ("r" "Send region" my/python-shell-send-and-show)
-      ("d" "Send function" my/python-shell-send-defun-and-show)
-      ("l" "Send file" python-shell-send-file)]
-     
-     ["📦 Cells"
-      ("n" "Next cell" my/python-commander-cells-forward)
-      ("p" "Previous cell" my/python-commander-cells-backward)
-      ("e" "Eval cell" my/python-commander-cells-eval)
-      ("m" "Mark cell" my/python-commander-cells-mark)
-      ("%" "Cell menu" my/python-commander-cells-menu)
-      ("a" "Eval above" my/python-commander-cells-eval-above)]
-     
-     ["🧪 Tests"
-      ("t" "Test dispatch" python-pytest-dispatch :if (lambda () (fboundp 'python-pytest-dispatch)))
-      ("f" "Test function" python-pytest-function :if (lambda () (fboundp 'python-pytest-function)))
-      ("F" "Test file" python-pytest-file :if (lambda () (fboundp 'python-pytest-file)))
-      ("T" "Test all" python-pytest :if (lambda () (fboundp 'python-pytest)))
-      ("L" "Test last failed" python-pytest-last-failed :if (lambda () (fboundp 'python-pytest-last-failed)))]
-     
-     ["🔧 Tools"
-      ("R" "Ruff format" my/ruff-format-buffer :if (lambda () (executable-find "ruff")))
-      ("C" "Ruff check" my/ruff-check-buffer :if (lambda () (executable-find "ruff")))
-      ("v" "Activate venv" pyvenv-activate :if (lambda () (fboundp 'pyvenv-activate)))
-      ("V" "Deactivate venv" pyvenv-deactivate :if (lambda () (fboundp 'pyvenv-deactivate)))
-      ("D" "Detect env" my/detect-python-env :if (lambda () (fboundp 'my/detect-python-env)))]
-     
-     ["📚 LSP"
-      :if (lambda () (bound-and-true-p eglot--managed-mode))
-      ("g" "Go to definition" xref-find-definitions)
-      ("h" "Hover docs" eldoc)
-      ("R" "Rename" eglot-rename)
-      ("A" "Code actions" eglot-code-actions)
-      ("=" "Format" eglot-format)]]
-    
-    [["🚪 Quit"
-      ("q" "Quit" transient-quit-one)]])
+  [["🚪 Quit"
+    ("q" "Quit" transient-quit-one)]])
 
 ;; Setup keybindings in Python modes
 (with-eval-after-load 'python
