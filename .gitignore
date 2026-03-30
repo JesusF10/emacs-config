@@ -63,3 +63,7 @@ places
 
 # Transient files
 transient/
+
+# Documentation (internal context and implementation notes)
+CONTEXT.md
+IMPLEMENTATION_COMPLETE.md

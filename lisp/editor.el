@@ -163,42 +163,22 @@
 ;; File Explorer Config ;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-;; File explorer configuration
+;; Dired: Built-in file manager with enhanced settings
 (use-package dired
+  :ensure nil
+  :commands (dired dired-jump)
+  :custom
+  (dired-listing-switches "-l --almost-all --human-readable --group-directories-first --no-group")
+  (dired-dwim-target t)  ; Guess copy/move target from other dired buffer
+  (dired-recursive-copies 'always)  ; Always copy recursively
+  (dired-recursive-deletes 'top)  ; Ask once for recursive deletes
   :config
-  (setq dired-listing-switches
-        "-l --almost-all --human-readable --group-directories-first --no-group")
-  ;; this command is useful when you want to close the window of `dirvish-side'
-  ;; automatically when opening a file
   (put 'dired-find-alternate-file 'disabled nil))
 
-;; Dirvish: Modern file manager to replace dired
-(use-package dirvish
+;; Nerd Icons for Dired: Minimal icon display
+(use-package nerd-icons-dired
   :ensure t
-  :defer t
-  :config
-  (dirvish-override-dired-mode 1)
-  ;; Basic dirvish settings
-  (setq dirvish-mode-line-format
-        '(:left (sort symlink) :right (omit yank index)))
-  
-  ;; Configure attributes (visual enhancements)
-  (setq dirvish-attributes
-        '(vc-state subtree-state nerd-icons collapse git-msg file-time file-size))
-
-  :bind
-  (:map visual-map
-   ("f" . dirvish)
-   ("s" . dirvish-side))
-  (:map dirvish-mode-map
-   ;; Vim-style navigation
-   ("j" . dired-next-line)
-   ("k" . dired-previous-line)
-   ("h" . dired-up-directory)
-   ("l" . dired-find-file)
-   ;; Additional useful bindings
-   ("?" . dirvish-dispatch)     ; Help menu
-   ("q" . quit-window)))
+  :hook (dired-mode . nerd-icons-dired-mode))
 
 
 ;;;;;;;;;;;;;;;;;;;;;;;;
