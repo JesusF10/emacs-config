@@ -16,7 +16,8 @@ A clean, modular Emacs configuration using the [Elpaca](https://github.com/progf
 │   ├── lsp.el           # LSP, Tree-sitter, and Python development
 │   ├── org-mode.el      # Org-mode configuration
 │   └── utils.el         # Utility functions
-├── PYTHON_SETUP.md      # Python development setup guide
+├── PYTHON_SETUP.md      # Python basic setup guide (LSP, linting, formatting)
+├── PYTHON_ADVANCED.md   # Advanced Python features (REPL, debugging, testing, Jupyter)
 └── README.md            # This file
 ```
 
@@ -220,17 +221,42 @@ Pre-configured for enhanced syntax highlighting and parsing.
 - **Marginalia**: Rich annotations in minibuffer
 - **Orderless**: Flexible completion matching
 
-### Python-based Workflow
+### Python Development Workflow
 
-This configuration is optimized for Python work with per-project isolation and modern Rust-based tooling:
+This configuration is optimized for professional Python development with **two comprehensive guides**:
+
+📘 **[PYTHON_SETUP.md](PYTHON_SETUP.md)** - Basic setup (LSP, linting, formatting)  
+📗 **[PYTHON_ADVANCED.md](PYTHON_ADVANCED.md)** - Advanced features (REPL, debugging, testing, Jupyter-like workflow)
+
+#### Core Features
+
+**Per-project Isolation:**
+- Automatic `.venv` detection and activation
+- Visual venv indicator in modeline: `[venv:.venv]`
+- Tool isolation (ty, ruff, debugpy per project)
+
+**Interactive Development:**
+- IPython REPL integration with send-region/function/buffer
+- Jupyter-like code cells (execute blocks with `# %%` markers)
+- Live variable inspection and evaluation
+
+**Testing & Debugging:**
+- Pytest integration (run function/file/all tests)
+- Visual debugger with breakpoints (DAP-mode)
+- Step through code, inspect variables, eval expressions
+
+**Performance Optimized:**
+- Native compilation support (10-30% faster)
+- Optimized garbage collection (16MB threshold)
+- Async LSP with debouncing (0.5s idle time)
 
 #### File Format Support
 
-- **CSV**: Column-aligned editing with `csv-mode` (Tree-sitter enhanced)
-- **Markdown/MDX**: Technical documentation and notebooks
-- **TOML**: Modern Python project configuration (`pyproject.toml`)
-- **YAML**: Data pipelines and configuration files
-- **Python**: Full LSP support with type checking and formatting
+- **CSV**: Column-aligned editing (Tree-sitter enhanced)
+- **Markdown/MDX**: Technical documentation
+- **TOML**: Modern Python config (`pyproject.toml`)
+- **YAML**: Data pipelines and config files
+- **Python**: Full LSP + type checking + formatting
 
 #### Workflow Example
 
@@ -528,6 +554,14 @@ If you encounter LSP connection problems:
    - Ty is 10-100x faster than Pyright for large projects
    - If LSP feels slow, check `*eglot stderr*` for errors
    - Ensure ty is installed locally (not falling back to global/missing)
+   - Run native compilation: `M-x my/native-compile-packages` (one-time, 5-10 min)
+
+7. **Advanced Python features troubleshooting**:
+   - **Debugger not working**: Install `debugpy` in venv: `uv pip install debugpy`
+   - **Tests not running**: Install pytest: `uv pip install pytest`
+   - **REPL using wrong Python**: Restart with `C-u C-c C-z` or reactivate venv
+   - **Code cells not detected**: Ensure cells start with `# %%` (with space)
+   - See [PYTHON_ADVANCED.md](PYTHON_ADVANCED.md) for detailed troubleshooting
 
 ### Tree-sitter Parser Issues
 

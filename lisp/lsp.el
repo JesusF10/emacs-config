@@ -195,10 +195,19 @@
                         (unless (derived-mode-p 'python-mode 'python-ts-mode)
                           (eglot-ensure)))))
   :config
-  (setq eglot-autoshutdown t                    ; Shutdown LSP server when last buffer is closed
+  ;; Performance optimizations for large projects
+  (setq eglot-events-buffer-size 0              ; Disable event logging (reduces memory)
+        eglot-autoshutdown t                    ; Shutdown LSP server when last buffer is closed
         eglot-confirm-server-initiated-edits nil ; Don't ask for confirmation on LSP edits
         eglot-extend-to-xref t                  ; Extend LSP to xref functionality
-        eglot-ignored-server-capabilities '(:documentOnTypeFormattingProvider))
+        eglot-sync-connect nil                   ; Async connection (faster startup)
+        eglot-connect-timeout 10                 ; 10s timeout for LSP connection
+        eglot-send-changes-idle-time 0.5)        ; Debounce: send changes after 0.5s idle
+  
+  ;; Disable intrusive features for better performance
+  (setq eglot-ignored-server-capabilities
+        '(:documentOnTypeFormattingProvider      ; Don't format while typing
+          :documentHighlightProvider))           ; Don't highlight all occurrences (can be slow)
 
   ;; Python LSP with Ty (Rust-based, replaces Pyright)
   (add-to-list 'eglot-server-programs
@@ -312,15 +321,273 @@
 )
 
 
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; Virtual Environment Management ;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+;; Pyvenv: Visual virtual environment management
+(use-package pyvenv
+  :ensure t
+  :defer t
+  :commands (pyvenv-activate pyvenv-workon pyvenv-deactivate)
+  :init
+  ;; Display current venv in modeline
+  (setq pyvenv-mode-line-indicator '(pyvenv-virtual-env-name ("[venv:" pyvenv-virtual-env-name "] ")))
+  
+  :config
+  ;; Workon home for virtualenvwrapper compatibility
+  (when (getenv "WORKON_HOME")
+    (setq pyvenv-workon-home (getenv "WORKON_HOME")))
+  
+  ;; Hook to restart LSP when venv changes
+  (add-hook 'pyvenv-post-activate-hooks
+            (lambda ()
+              (when (bound-and-true-p eglot--managed-mode)
+                (eglot-reconnect (eglot--current-server-or-lose)))))
+  
+  (add-hook 'pyvenv-post-deactivate-hooks
+            (lambda ()
+              (when (bound-and-true-p eglot--managed-mode)
+                (eglot-reconnect (eglot--current-server-or-lose))))))
+
+;; Enable pyvenv-mode globally (lightweight, only adds modeline indicator)
+(add-hook 'python-mode-hook #'pyvenv-mode)
+(add-hook 'python-ts-mode-hook #'pyvenv-mode)
+
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; Jupyter/Code Cells Integration ;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+;; code-cells: Jupyter-like cell execution in Python files
+;; Use # %% to delimit cells (compatible with VS Code, Jupyter, Spyder)
+(use-package code-cells
+  :ensure t
+  :defer t
+  :hook ((python-mode python-ts-mode) . code-cells-mode-maybe)
+  :config
+  ;; Keybindings for cell navigation and execution
+  (defun my/code-cells-setup ()
+    "Set up code-cells keybindings."
+    (local-set-key (kbd "C-c %") 'code-cells-command)
+    (local-set-key (kbd "C-c C-n") 'code-cells-forward-cell)
+    (local-set-key (kbd "C-c C-p") 'code-cells-backward-cell)
+    (local-set-key (kbd "C-c C-e") 'code-cells-eval)
+    (local-set-key (kbd "C-c C-SPC") 'code-cells-mark-cell))
+  
+  (add-hook 'code-cells-mode-hook #'my/code-cells-setup)
+  
+  ;; Configure cell markers (# %% is standard across tools)
+  (setq code-cells-boundary-markers "# %%"))
+
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; Pytest Integration    ;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+;; python-pytest: Interactive test runner for pytest
+(use-package python-pytest
+  :ensure t
+  :defer t
+  :commands (python-pytest-dispatch
+             python-pytest-function
+             python-pytest-file
+             python-pytest-last-failed
+             python-pytest-repeat)
+  :init
+  ;; Keybindings for pytest
+  (define-prefix-command 'python-test-map nil "Python Tests")
+  
+  :bind (:map python-mode-map
+              ("C-c t" . python-test-map)
+              ("C-c t t" . python-pytest-dispatch)
+              ("C-c t f" . python-pytest-function)
+              ("C-c t m" . python-pytest-file)
+              ("C-c t a" . python-pytest)
+              ("C-c t l" . python-pytest-last-failed)
+              ("C-c t r" . python-pytest-repeat))
+  :bind (:map python-ts-mode-map
+              ("C-c t" . python-test-map)
+              ("C-c t t" . python-pytest-dispatch)
+              ("C-c t f" . python-pytest-function)
+              ("C-c t m" . python-pytest-file)
+              ("C-c t a" . python-pytest)
+              ("C-c t l" . python-pytest-last-failed)
+              ("C-c t r" . python-pytest-repeat))
+  
+  :config
+  ;; Use project-specific pytest if available
+  (setq python-pytest-executable "pytest")
+  
+  ;; Colorized output
+  (when (executable-find "pytest")
+    (add-to-list 'python-pytest-arguments "--color=yes")))
+
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; Python Debugger (DAP-mode)   ;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+;; dap-mode: Debug Adapter Protocol support
+(use-package dap-mode
+  :ensure t
+  :defer t
+  :commands (dap-debug dap-debug-last dap-breakpoint-toggle)
+  :after (eglot)
+  :config
+  ;; Enable dap-python (uses debugpy)
+  (require 'dap-python)
+  
+  ;; Debugpy configuration (will use venv's debugpy if available)
+  (setq dap-python-debugger 'debugpy)
+  
+  ;; Auto-configure Python debug templates
+  (defun my/dap-python-setup ()
+    "Setup DAP for Python with sensible defaults."
+    (dap-register-debug-template
+     "Python :: Run Configuration"
+     (list :type "python"
+           :args ""
+           :cwd nil
+           :program nil
+           :request "launch"
+           :name "Python :: Run Configuration"))
+    
+    (dap-register-debug-template
+     "Python :: Run pytest"
+     (list :type "python"
+           :args "-sv"
+           :cwd nil
+           :program nil
+           :module "pytest"
+           :request "launch"
+           :name "Python :: Run pytest")))
+  
+  (my/dap-python-setup)
+  
+  ;; UI configurations
+  (setq dap-auto-configure-features '(sessions locals breakpoints expressions tooltip))
+  
+  ;; Keybindings
+  (define-prefix-command 'python-debug-map nil "Python Debug")
+  :bind (:map python-mode-map
+              ("C-c d" . python-debug-map)
+              ("C-c d d" . dap-debug)
+              ("C-c d l" . dap-debug-last)
+              ("C-c d b" . dap-breakpoint-toggle)
+              ("C-c d n" . dap-next)
+              ("C-c d i" . dap-step-in)
+              ("C-c d o" . dap-step-out)
+              ("C-c d c" . dap-continue)
+              ("C-c d q" . dap-disconnect)
+              ("C-c d e" . dap-eval)
+              ("C-c d r" . dap-eval-region))
+  :bind (:map python-ts-mode-map
+              ("C-c d" . python-debug-map)
+              ("C-c d d" . dap-debug)
+              ("C-c d l" . dap-debug-last)
+              ("C-c d b" . dap-breakpoint-toggle)
+              ("C-c d n" . dap-next)
+              ("C-c d i" . dap-step-in)
+              ("C-c d o" . dap-step-out)
+              ("C-c d c" . dap-continue)
+              ("C-c d q" . dap-disconnect)
+              ("C-c d e" . dap-eval)
+              ("C-c d r" . dap-eval-region)))
+
+;; dap-ui: Enhanced debugging UI
+(use-package dap-ui
+  :ensure nil
+  :after dap-mode
+  :config
+  (dap-ui-mode 1)
+  ;; Enable helpful UI features
+  (dap-tooltip-mode 1)
+  (tooltip-mode 1))
+
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; Interactive Python REPL Configuration ;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+;; Enhanced Python REPL with IPython support
+(use-package python
+  :ensure nil
+  :defer t
+  :config
+  ;; Use IPython if available, fallback to python
+  (when (executable-find "ipython")
+    (setq python-shell-interpreter "ipython"
+          python-shell-interpreter-args "--simple-prompt -i --no-banner"
+          python-shell-prompt-regexp "In \\[[0-9]+\\]: "
+          python-shell-prompt-output-regexp "Out\\[[0-9]+\\]: "
+          python-shell-completion-setup-code
+          "from IPython.core.completerlib import module_completion"
+          python-shell-completion-module-string-code
+          "';'.join(module_completion('''%s'''))\n"
+          python-shell-completion-string-code
+          "';'.join(get_ipython().Completer.all_completions('''%s'''))\n"))
+  
+  ;; Better indentation
+  (setq python-indent-guess-indent-offset-verbose nil)
+  
+  ;; Don't highlight indentation errors (handled by Ruff)
+  (setq python-indent-def-block-scale 1)
+  
+  ;; Enable shell completion
+  (setq python-shell-completion-native-enable t))
+
+;; Popup for Python REPL (non-intrusive window management)
+(use-package python-popup
+  :ensure nil
+  :after python
+  :init
+  ;; Custom popup function for Python REPL
+  (defun my/python-shell-send-and-show (start end)
+    "Send region to Python shell and briefly show output."
+    (interactive "r")
+    (python-shell-send-region start end)
+    (let ((repl-window (get-buffer-window (python-shell-get-buffer) t)))
+      (when repl-window
+        (with-selected-window repl-window
+          (goto-char (point-max))))))
+  
+  (defun my/python-shell-send-buffer-and-show ()
+    "Send entire buffer to Python shell."
+    (interactive)
+    (python-shell-send-buffer)
+    (message "Buffer sent to Python shell"))
+  
+  (defun my/python-shell-send-defun-and-show ()
+    "Send current function to Python shell."
+    (interactive)
+    (python-shell-send-defun)
+    (message "Function sent to Python shell"))
+  
+  ;; Keybindings for REPL interaction
+  :bind (:map python-mode-map
+              ("C-c C-z" . python-shell-switch-to-shell)
+              ("C-c C-c" . my/python-shell-send-buffer-and-show)
+              ("C-c C-r" . my/python-shell-send-and-show)
+              ("C-c C-d" . my/python-shell-send-defun-and-show)
+              ("C-c C-l" . python-shell-send-file))
+  :bind (:map python-ts-mode-map
+              ("C-c C-z" . python-shell-switch-to-shell)
+              ("C-c C-c" . my/python-shell-send-buffer-and-show)
+              ("C-c C-r" . my/python-shell-send-and-show)
+              ("C-c C-d" . my/python-shell-send-defun-and-show)
+              ("C-c C-l" . python-shell-send-file)))
+
+
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Python Environment Detection   ;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 (defun my/detect-python-env ()
   "Detect and configure Python virtual environment (uv-aware).
-Detects local .venv directories, adjusts PATH to prioritize local tools
-(ty, ruff, python), and warns if tools are missing. Starts Eglot after
-environment is configured."
+Detects local .venv directories, activates with pyvenv, adjusts PATH
+to prioritize local tools (ty, ruff, python), and warns if tools are
+missing. Starts Eglot after environment is configured."
   (when-let* ((project-root (or (project-root (project-current))
                                 default-directory))
               (venv-path (expand-file-name ".venv" project-root)))
@@ -330,8 +597,8 @@ environment is configured."
              (ruff-path (expand-file-name "ruff" venv-bin))
              (python-path (expand-file-name "python" venv-bin)))
         
-        ;; Set VIRTUAL_ENV
-        (setenv "VIRTUAL_ENV" venv-path)
+        ;; Activate venv with pyvenv (updates modeline, VIRTUAL_ENV, etc.)
+        (pyvenv-activate venv-path)
         
         ;; Prepend .venv/bin to PATH so Eglot finds local tools
         (setenv "PATH" (concat venv-bin path-separator (getenv "PATH")))
@@ -410,6 +677,13 @@ Creates a .venv directory and installs development tools locally."
 
 (define-prefix-command 'flymake-map nil "Flymake")
 (define-key lsp-map (kbd "m") 'flymake-map)
+
+;; Python venv management
+(define-prefix-command 'python-venv-map nil "Python Venv")
+(define-key lsp-map (kbd "v") 'python-venv-map)
+(bind-key (kbd "a") #'pyvenv-activate 'python-venv-map)
+(bind-key (kbd "d") #'pyvenv-deactivate 'python-venv-map)
+(bind-key (kbd "w") #'pyvenv-workon 'python-venv-map)
 
 ;; Ruff manual
 (bind-key (kbd "C-c l F") #'my/ruff-format-buffer)

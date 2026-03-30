@@ -4,9 +4,48 @@
 ;; This is the main configuration entry point for Emacs.
 ;; It loads modular configuration files from the lisp/ directory.
 
-;; Improve startup performance
-(setq gc-cons-threshold (* 50 1000 1000)) ;; Increase GC threshold during startup
-(setq read-process-output-max (* 1024 1024)) ;; Increase process read size
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; Performance Optimization (Startup) ;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+;; Native Compilation Settings (Emacs 28+)
+(when (native-comp-available-p)
+  ;; Silence native-comp warnings (they can be noisy)
+  (setq native-comp-async-report-warnings-errors nil)
+  
+  ;; Increase native compilation cache size
+  (setq native-comp-async-jobs-number 4)  ; Use 4 CPU cores for compilation
+  
+  ;; Compile packages in background
+  (setq native-comp-deferred-compilation t)
+  
+  ;; Set compilation path
+  (startup-redirect-eln-cache
+   (expand-file-name "eln-cache/" user-emacs-directory))
+  
+  (message "Native compilation enabled with %d jobs" native-comp-async-jobs-number))
+
+;; Maximize GC threshold during startup (defer GC for speed)
+;; This will be reset after initialization completes
+(setq gc-cons-threshold most-positive-fixnum
+      gc-cons-percentage 0.6)
+
+;; Increase process read size for LSP servers (especially Eglot/Ty)
+;; Default is 4KB, we increase to 1MB for better LSP performance
+(setq read-process-output-max (* 1024 1024))
+
+;; Prevent garbage collection during minibuffer usage
+;; GC during completion causes noticeable lag
+(defun my/minibuffer-gc-setup ()
+  "Defer garbage collection while in minibuffer."
+  (setq gc-cons-threshold most-positive-fixnum))
+
+(defun my/minibuffer-gc-restore ()
+  "Restore garbage collection after minibuffer."
+  (run-at-time 1 nil (lambda () (setq gc-cons-threshold my/gc-cons-threshold))))
+
+(add-hook 'minibuffer-setup-hook #'my/minibuffer-gc-setup)
+(add-hook 'minibuffer-exit-hook #'my/minibuffer-gc-restore)
 
 ;; Enable underlining at the descent line
 (setq x-underline-at-descent-line t)
@@ -59,8 +98,26 @@
 (load-config-module "org-mode")    ;; Org-mode customizations
 (load-config-module "utils")       ;; Utilities & miscellaneous
 
-;; Restore GC threshold after initialization
-(setq gc-cons-threshold (* 2 1000 1000))
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; Post-Initialization GC Configuration ;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+;; After startup completes, set GC to optimal runtime values
+;; 16MB threshold balances memory usage and GC pauses
+;; GC triggers less frequently but still prevents excessive memory growth
+(defvar my/gc-cons-threshold (* 16 1024 1024)
+  "Optimal GC threshold for runtime (16MB).")
+
+(setq gc-cons-threshold my/gc-cons-threshold
+      gc-cons-percentage 0.1)
+
+;; GC when Emacs loses focus (prevents GC during active editing)
+;; This strategy significantly reduces perceived lag
+(add-hook 'focus-out-hook #'garbage-collect)
+
+;; Show GC statistics in messages (useful for profiling)
+;; Disable if it gets noisy: (setq garbage-collection-messages nil)
+(setq garbage-collection-messages t)
 
 
 ;;; init.el ends here
