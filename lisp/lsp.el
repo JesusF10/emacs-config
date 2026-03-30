@@ -495,13 +495,9 @@
               ("C-c d e" . dap-eval)
               ("C-c d r" . dap-eval-region)))
 
-;; dap-ui: Enhanced debugging UI
-(use-package dap-ui
-  :ensure nil
-  :after dap-mode
-  :config
+;; Enable dap-ui features (part of dap-mode)
+(with-eval-after-load 'dap-mode
   (dap-ui-mode 1)
-  ;; Enable helpful UI features
   (dap-tooltip-mode 1)
   (tooltip-mode 1))
 
@@ -537,11 +533,8 @@
   ;; Enable shell completion
   (setq python-shell-completion-native-enable t))
 
-;; Popup for Python REPL (non-intrusive window management)
-(use-package python-popup
-  :ensure nil
-  :after python
-  :init
+;; Custom helper functions for Python REPL
+(with-eval-after-load 'python
   ;; Custom popup function for Python REPL
   (defun my/python-shell-send-and-show (start end)
     "Send region to Python shell and briefly show output."
@@ -565,18 +558,17 @@
     (message "Function sent to Python shell"))
   
   ;; Keybindings for REPL interaction
-  :bind (:map python-mode-map
-              ("C-c C-z" . python-shell-switch-to-shell)
-              ("C-c C-c" . my/python-shell-send-buffer-and-show)
-              ("C-c C-r" . my/python-shell-send-and-show)
-              ("C-c C-d" . my/python-shell-send-defun-and-show)
-              ("C-c C-l" . python-shell-send-file))
-  :bind (:map python-ts-mode-map
-              ("C-c C-z" . python-shell-switch-to-shell)
-              ("C-c C-c" . my/python-shell-send-buffer-and-show)
-              ("C-c C-r" . my/python-shell-send-and-show)
-              ("C-c C-d" . my/python-shell-send-defun-and-show)
-              ("C-c C-l" . python-shell-send-file)))
+  (define-key python-mode-map (kbd "C-c C-z") 'python-shell-switch-to-shell)
+  (define-key python-mode-map (kbd "C-c C-c") 'my/python-shell-send-buffer-and-show)
+  (define-key python-mode-map (kbd "C-c C-r") 'my/python-shell-send-and-show)
+  (define-key python-mode-map (kbd "C-c C-d") 'my/python-shell-send-defun-and-show)
+  (define-key python-mode-map (kbd "C-c C-l") 'python-shell-send-file)
+  
+  (define-key python-ts-mode-map (kbd "C-c C-z") 'python-shell-switch-to-shell)
+  (define-key python-ts-mode-map (kbd "C-c C-c") 'my/python-shell-send-buffer-and-show)
+  (define-key python-ts-mode-map (kbd "C-c C-r") 'my/python-shell-send-and-show)
+  (define-key python-ts-mode-map (kbd "C-c C-d") 'my/python-shell-send-defun-and-show)
+  (define-key python-ts-mode-map (kbd "C-c C-l") 'python-shell-send-file))
 
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
