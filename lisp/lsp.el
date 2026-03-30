@@ -375,10 +375,7 @@
     (local-set-key (kbd "C-c C-e") 'code-cells-eval)
     (local-set-key (kbd "C-c C-SPC") 'code-cells-mark-cell))
   
-  (add-hook 'code-cells-mode-hook #'my/code-cells-setup)
-  
-  ;; Configure cell markers (# %% is standard across tools)
-  (setq code-cells-boundary-markers "# %%"))
+  (add-hook 'code-cells-mode-hook #'my/code-cells-setup))
 
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;
