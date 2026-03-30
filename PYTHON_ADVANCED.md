@@ -3,6 +3,7 @@
 This guide covers the advanced Python development features available in your Emacs configuration.
 
 ## Table of Contents
+
 1. [Virtual Environment Management](#virtual-environment-management)
 2. [Interactive Python REPL](#interactive-python-repl)
 3. [Jupyter-like Workflow (Code Cells)](#jupyter-like-workflow)
@@ -15,12 +16,14 @@ This guide covers the advanced Python development features available in your Ema
 ## Virtual Environment Management
 
 ### Features
+
 - **Visual indicator** in modeline showing active venv: `[venv:.venv]`
 - **Automatic detection** of project `.venv` directories
 - **Manual activation** of any virtualenv
 - **Auto-restart LSP** when switching venvs
 
 ### Keybindings
+
 - `C-c l v a` - Activate a venv (browse to directory)
 - `C-c l v d` - Deactivate current venv
 - `C-c l v w` - Workon (select from `$WORKON_HOME`)
@@ -28,6 +31,7 @@ This guide covers the advanced Python development features available in your Ema
 ### Usage
 
 **Automatic (recommended):**
+
 ```bash
 # 1. Create project with uv
 cd ~/projects/my-project
@@ -41,6 +45,7 @@ uv pip install ty ruff pandas numpy
 ```
 
 **Manual activation:**
+
 ```
 M-x pyvenv-activate RET ~/projects/my-project/.venv RET
 ```
@@ -50,12 +55,14 @@ M-x pyvenv-activate RET ~/projects/my-project/.venv RET
 ## Interactive Python REPL
 
 ### Features
+
 - **IPython integration** (falls back to standard Python)
 - **Send regions/functions/buffer** to REPL
 - **Persistent history** and completions
 - **Non-intrusive** window management
 
 ### Keybindings
+
 - `C-c C-z` - Start/switch to Python shell
 - `C-c C-c` - Send entire buffer to REPL
 - `C-c C-r` - Send region to REPL (select region first)
@@ -76,6 +83,7 @@ print(df.head())
 ```
 
 **Workflow:**
+
 1. Open `example.py`
 2. Press `C-c C-z` to start IPython REPL
 3. Press `C-c C-d` with cursor on `load_data()` to send function
@@ -85,6 +93,7 @@ print(df.head())
 ### Installing IPython
 
 For the best REPL experience:
+
 ```bash
 # Inside your venv
 uv pip install ipython
@@ -95,6 +104,7 @@ uv pip install ipython
 ## Jupyter-like Workflow
 
 ### Features
+
 - **Code cells** in regular `.py` files (no need for `.ipynb`)
 - **Execute cells** individually like Jupyter notebooks
 - **Navigate between cells** quickly
@@ -119,6 +129,7 @@ print(summary)
 ```
 
 ### Keybindings
+
 - `C-c C-n` - Go to next cell
 - `C-c C-p` - Go to previous cell
 - `C-c C-e` - Execute current cell
@@ -139,12 +150,14 @@ print(summary)
 ## Testing with Pytest
 
 ### Features
+
 - **Run tests** from Emacs (no terminal switching)
 - **Execute** single function, file, or entire suite
 - **Re-run failed tests** only
 - **Colorized output** in compilation buffer
 
 ### Keybindings
+
 - `C-c t t` - Pytest dispatch menu (choose what to run)
 - `C-c t f` - Run test at point (current function)
 - `C-c t m` - Run tests in current file
@@ -185,6 +198,7 @@ def test_add_negative():
 ## Debugging with pdb
 
 ### Features
+
 - **Built-in Python debugger** (no external dependencies)
 - **Step through code** line by line
 - **Inspect variables** in real-time
@@ -198,6 +212,7 @@ def test_add_negative():
 ### Usage
 
 **Method 1: Add breakpoint in code**
+
 ```python
 # debug_example.py
 def calculate_average(numbers):
@@ -211,6 +226,7 @@ result = calculate_average(data)
 ```
 
 **Method 2: Run with debugger from start**
+
 ```bash
 python -m pdb your_script.py
 ```
@@ -219,24 +235,25 @@ python -m pdb your_script.py
 
 In the pdb prompt:
 
-| Command | Description |
-|---------|-------------|
-| `n` (next) | Execute current line, go to next |
-| `s` (step) | Step into function call |
-| `c` (continue) | Continue until next breakpoint |
-| `p variable` | Print variable value |
-| `pp variable` | Pretty-print variable |
-| `l` (list) | Show code around current line |
-| `w` (where) | Show stack trace |
-| `u` (up) | Move up in stack |
-| `d` (down) | Move down in stack |
-| `b 10` | Set breakpoint at line 10 |
-| `cl 1` | Clear breakpoint 1 |
-| `q` (quit) | Exit debugger |
+| Command        | Description                      |
+| -------------- | -------------------------------- |
+| `n` (next)     | Execute current line, go to next |
+| `s` (step)     | Step into function call          |
+| `c` (continue) | Continue until next breakpoint   |
+| `p variable`   | Print variable value             |
+| `pp variable`  | Pretty-print variable            |
+| `l` (list)     | Show code around current line    |
+| `w` (where)    | Show stack trace                 |
+| `u` (up)       | Move up in stack                 |
+| `d` (down)     | Move down in stack               |
+| `b 10`         | Set breakpoint at line 10        |
+| `cl 1`         | Clear breakpoint 1               |
+| `q` (quit)     | Exit debugger                    |
 
 ### Debugging Workflow in Emacs
 
 **Example script:**
+
 ```python
 # debug_example.py
 def calculate_average(numbers):
@@ -257,13 +274,14 @@ result2 = calculate_average(empty)
 ```
 
 **Debug in Emacs:**
+
 1. Open file in Emacs
 2. Run: `M-x compile RET python debug_example.py RET`
 3. When pdb stops at breakpoint, you see:
    ```
    > /path/to/debug_example.py(3)calculate_average()
    -> total = sum(numbers)
-   (Pdb) 
+   (Pdb)
    ```
 4. Type commands in compilation buffer:
    ```
@@ -291,12 +309,14 @@ def calculate_average(numbers):
 ### Pro Tips
 
 **1. Conditional breakpoints:**
+
 ```python
 if condition:
     import pdb; pdb.set_trace()
 ```
 
 **2. Post-mortem debugging:**
+
 ```python
 import pdb
 try:
@@ -306,6 +326,7 @@ except Exception:
 ```
 
 **3. IPython debugger (better pdb):**
+
 ```bash
 # Install in venv
 uv pip install ipdb
@@ -319,140 +340,95 @@ import ipdb; ipdb.set_trace()  # Colored output, tab completion
 For a GUI debugging experience similar to VS Code/PyCharm, consider:
 
 **Option 1: realgud (Emacs package)**
+
 - Graphical debugger interface
 - Works with pdb, gdb, lldb
 - Install: `M-x elpaca-try RET realgud RET`
 
 **Option 2: External debugger**
+
 - VS Code with Remote SSH
 - PyCharm Community Edition
 - pudb (terminal UI debugger): `uv pip install pudb`
 
----
-
-## Performance Tips
-
-### Native Compilation
-
-Your Emacs has **native compilation enabled**. Compile packages for better performance:
-
-```elisp
-;; In Emacs, run once:
-M-x my/native-compile-packages
-
-;; This compiles all packages (~5-10 minutes)
-;; Significantly improves runtime speed (10-30% faster)
-```
-
-Compile your config:
-```elisp
-M-x my/native-compile-config
-```
-
-### Garbage Collection
-
-The configuration includes optimized GC settings:
-- **Startup**: GC deferred for fast init
-- **Runtime**: 16MB threshold (balanced)
-- **Minibuffer**: GC paused during completion
-- **Focus-out**: GC runs when Emacs loses focus
-
-**No action needed** - automatic optimization.
-
-### LSP Performance
-
-For large projects (>10k LOC), Eglot is optimized with:
-- **Async connection**: non-blocking startup
-- **Debouncing**: changes sent after 0.5s idle
-- **Disabled**: documentHighlight (can be slow)
-- **Event logging**: disabled to save memory
-
-If Eglot feels slow, try:
-```elisp
-;; Increase debounce time (more delay, less CPU)
-(setq eglot-send-changes-idle-time 1.0)
-```
-
-### Project-specific Optimizations
-
-Create `.dir-locals.el` in project root:
-
-```elisp
-;; Disable certain features for this project
-((python-mode . ((eglot-workspace-configuration
-                  . ((:python :analysis :typeCheckingMode "off"))))))
-```
-
----
-
 ## Quick Reference Card
 
 ### Virtual Environments
-| Keybinding | Action |
-|------------|--------|
-| `C-c l v a` | Activate venv |
-| `C-c l v d` | Deactivate venv |
+
+| Keybinding  | Action                     |
+| ----------- | -------------------------- |
+| `C-c l v a` | Activate venv              |
+| `C-c l v d` | Deactivate venv            |
 | `C-c l v w` | Workon (from $WORKON_HOME) |
 
 ### REPL
-| Keybinding | Action |
-|------------|--------|
-| `C-c C-z` | Start/switch to REPL |
-| `C-c C-c` | Send buffer |
-| `C-c C-r` | Send region |
-| `C-c C-d` | Send function |
+
+| Keybinding | Action               |
+| ---------- | -------------------- |
+| `C-c C-z`  | Start/switch to REPL |
+| `C-c C-c`  | Send buffer          |
+| `C-c C-r`  | Send region          |
+| `C-c C-d`  | Send function        |
 
 ### Code Cells
-| Keybinding | Action |
-|------------|--------|
-| `C-c C-n` | Next cell |
-| `C-c C-p` | Previous cell |
-| `C-c C-e` | Execute cell |
-| `C-c C-SPC` | Mark cell |
+
+| Keybinding  | Action        |
+| ----------- | ------------- |
+| `C-c C-n`   | Next cell     |
+| `C-c C-p`   | Previous cell |
+| `C-c C-e`   | Execute cell  |
+| `C-c C-SPC` | Mark cell     |
 
 ### Testing
-| Keybinding | Action |
-|------------|--------|
-| `C-c t t` | Pytest menu |
-| `C-c t f` | Test function |
-| `C-c t m` | Test file |
-| `C-c t a` | All tests |
-| `C-c t l` | Failed tests |
-| `C-c t r` | Repeat last |
+
+| Keybinding | Action        |
+| ---------- | ------------- |
+| `C-c t t`  | Pytest menu   |
+| `C-c t f`  | Test function |
+| `C-c t m`  | Test file     |
+| `C-c t a`  | All tests     |
+| `C-c t l`  | Failed tests  |
+| `C-c t r`  | Repeat last   |
 
 ### Debugging
-| Keybinding | Action |
-|------------|--------|
-| Built-in pdb | Use in code/terminal |
-| `import pdb; pdb.set_trace()` | Set breakpoint |
-| `breakpoint()` | Python 3.7+ breakpoint |
-| `M-x compile RET python -m pdb script.py` | Debug from Emacs |
+
+| Keybinding                                | Action                 |
+| ----------------------------------------- | ---------------------- |
+| Built-in pdb                              | Use in code/terminal   |
+| `import pdb; pdb.set_trace()`             | Set breakpoint         |
+| `breakpoint()`                            | Python 3.7+ breakpoint |
+| `M-x compile RET python -m pdb script.py` | Debug from Emacs       |
 
 ---
 
 ## Troubleshooting
 
 ### "IPython not found" (using standard Python REPL)
+
 ```bash
 uv pip install ipython
 ```
 
 ### "pytest not found"
+
 ```bash
 uv pip install pytest
 ```
 
 ### pdb not stopping at breakpoints
+
 1. Ensure you're running script (not importing module)
 2. Use `python -m pdb script.py` to start with debugger
 3. Check breakpoint syntax: `import pdb; pdb.set_trace()` or `breakpoint()`
 
 ### REPL not using venv Python
+
 1. Verify venv activation: `M-x pyvenv-activate`
 2. Restart REPL: `C-u C-c C-z` (with prefix argument)
 3. Check `python-shell-interpreter` variable: `C-h v python-shell-interpreter`
 
 ### Slow performance
+
 1. Run native compilation: `M-x my/native-compile-packages`
 2. Increase Eglot debounce: `(setq eglot-send-changes-idle-time 1.0)`
 3. Disable event logging: `(setq eglot-events-buffer-size 0)` (already set)
