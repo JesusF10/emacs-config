@@ -275,7 +275,7 @@
   :config
   (dashboard-setup-startup-hook)
   :custom
-  (dashboard-banner-logo-title "Data Science Edition - Emacs Config")
+  (dashboard-banner-logo-title "Welcome to Emacs")
   (dashboard-startup-banner 'logo)
   (dashboard-center-content t)
   (dashboard-items '((recents  . 5)

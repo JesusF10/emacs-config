@@ -147,12 +147,6 @@ This configuration includes the following packages, organized by functionality:
 - **Ruff Integration**: Python formatting and linting support with async Flymake backend
 - **Virtual Environment Detection**: Automatic Python .venv detection and PATH adjustment
 
-### Data Science Tooling
-
-- **[csv-mode](https://elpa.gnu.org/packages/csv-mode.html)**: CSV file editing with column alignment
-- **[toml-mode](https://github.com/dryman/toml-mode.el)**: TOML configuration file support
-- **[yaml-mode](https://github.com/yoshiki/yaml-mode)**: YAML configuration file support
-- **[markdown-mode](https://jblevins.org/projects/markdown-mode/)**: Markdown and MDX file editing
 
 ### Built-in Emacs Features Enhanced
 
@@ -202,7 +196,7 @@ Pre-configured for enhanced syntax highlighting and parsing.
 ### UI Improvements
 - Beautiful Doom Material Dark theme with modern color schemes
 - Modern startup dashboard with recent files, projects, and quick navigation
-- Rich icon support with nerd-icons (⚠️ requires `M-x nerd-icons-install-fonts`)
+- Rich icon support with nerd-icons (requires `M-x nerd-icons-install-fonts`)
   - File icons in Dired
   - Icons in completion candidates (Vertico/Consult)
   - Mode-line indicators
@@ -226,9 +220,9 @@ Pre-configured for enhanced syntax highlighting and parsing.
 - **Marginalia**: Rich annotations in minibuffer
 - **Orderless**: Flexible completion matching
 
-### Data Science Workflow
+### Python-based Workflow
 
-This configuration is optimized for Data Science work with per-project isolation and modern Rust-based tooling:
+This configuration is optimized for Python work with per-project isolation and modern Rust-based tooling:
 
 #### File Format Support
 
@@ -435,7 +429,7 @@ The configuration automatically remaps major modes to their Tree-sitter equivale
 
 - GNU Emacs 27.1 or later (29.3+ recommended for full Tree-sitter support)
 - Git (for package installation)
-- **Nerd Fonts** (⚠️ REQUIRED for icons): Install via `M-x nerd-icons-install-fonts` after first startup
+- **Nerd Fonts** (REQUIRED for icons): Install via `M-x nerd-icons-install-fonts` after first startup
   - Without this, you'll see square boxes with hexadecimal codes instead of icons
   - Used for file icons in Dired, Flymake error indicators, mode-line, and completion UI
 
@@ -443,55 +437,7 @@ The configuration automatically remaps major modes to their Tree-sitter equivale
 
 - **ripgrep**: Fast project-wide searching (used by Consult)
 
-### Python Development Requirements
 
-For full Python development features, install tools **per-project** (recommended):
-
-#### Quick Setup (Recommended)
-
-```bash
-# 1. Install uv globally (one-time setup)
-curl -LsSf https://astral.sh/uv/install.sh | sh
-
-# 2. For each project, create isolated environment
-cd your-project/
-uv venv
-source .venv/bin/activate  # Linux/Mac (.venv\Scripts\activate on Windows)
-
-# 3. Install development tools locally
-uv pip install ty ruff
-
-# 4. Install your project dependencies
-uv pip install pandas numpy scikit-learn jupyter  # Example
-
-# 5. Open project in Emacs (auto-detects .venv tools)
-emacs .
-```
-
-#### Alternative: Use Emacs Helper
-
-Inside Emacs in your project directory:
-
-```
-M-x my/init-python-project
-```
-
-This automatically runs steps 2-3 above.
-
-#### Why Per-Project Installation?
-
-- **Isolation**: Each project has independent tool versions
-- **Reproducibility**: Lock files ensure consistent environments
-- **Portability**: Other developers replicate environment with `uv sync`
-- **No Global Conflicts**: Project A with ruff 0.4, Project B with ruff 0.6
-
-#### Tool Requirements
-
-- **ty**: Rust-based Python type checker and LSP server (replaces Pyright)
-- **ruff**: Fast Python linter and formatter
-- **uv**: Python package and environment manager (replaces pip/virtualenv)
-
-The configuration automatically detects and warns if tools are missing from your local `.venv`.
 
 ## Troubleshooting
 
@@ -499,7 +445,7 @@ The configuration automatically detects and warns if tools are missing from your
 
 If you see square boxes with hexadecimal numbers/symbols instead of icons (in Dired, Flymake indicators, or anywhere else):
 
-1. **⚠️ CRITICAL STEP - Install icon fonts**:
+1. **Install icon fonts**:
 
    ```
    M-x nerd-icons-install-fonts
@@ -622,7 +568,7 @@ If Emacs feels slow:
 
 Feel free to fork this repository and customize it for your needs. If you have improvements or bug fixes, pull requests are welcome!
 
-## Written by: Jesus Flores Lacarra
+## Author: Jesus Flores Lacarra
 
 ⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⣀⣀⣠⣤⡤⠤⠴⠶⠦⣤⣤⣤⣀⣀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⣀⣀⣀⣀⣀⠀⠀⢀⣠⠶⢞⣻⣷⠀⠀⠀
 ⠀⠀⠀⠀⠀⠀⠀⠀⢀⣠⣶⠾⠛⠋⠉⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠈⠉⠙⠛⠲⠶⢤⣤⣤⣤⣀⣀⣀⣠⣴⡾⠿⠛⠛⠋⠉⣉⣉⣉⣉⡿⠋⣡⣾⣿⣿⡿⠀⠀⠀
