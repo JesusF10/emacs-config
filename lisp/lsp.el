@@ -534,8 +534,9 @@ Only cell menu (C-c %) kept for direct access."
 
 ;; Unified Python command hub using transient (built-in Emacs 28+)
 ;; Access all Python functionality from a single, discoverable menu
-(with-eval-after-load 'python
-  (require 'transient)
+
+;; Load immediately (not deferred) to ensure availability
+(require 'transient)
   
   ;; Wrapper functions to handle optional packages gracefully
   (defun my/python-commander-cells-forward ()
@@ -623,7 +624,9 @@ Only cell menu (C-c %) kept for direct access."
     
     [["🚪 Quit"
       ("q" "Quit" transient-quit-one)]])
-  
+
+;; Setup keybindings in Python modes
+(with-eval-after-load 'python
   ;; Bind Python Commander to C-c p in Python modes
   (define-key python-mode-map (kbd "C-c p") 'python-commander)
   (define-key python-ts-mode-map (kbd "C-c p") 'python-commander))
