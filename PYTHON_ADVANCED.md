@@ -4,12 +4,104 @@ This guide covers the advanced Python development features available in your Ema
 
 ## Table of Contents
 
-1. [Virtual Environment Management](#virtual-environment-management)
-2. [Interactive Python REPL](#interactive-python-repl)
-3. [Jupyter-like Workflow (Code Cells)](#jupyter-like-workflow)
-4. [Testing with Pytest](#testing-with-pytest)
-5. [Debugging with pdb](#debugging-with-pdb)
-6. [Performance Tips](#performance-tips)
+1. [Python Commander (Quick Start)](#python-commander)
+2. [Virtual Environment Management](#virtual-environment-management)
+3. [Interactive Python REPL](#interactive-python-repl)
+4. [Jupyter-like Workflow (Code Cells)](#jupyter-like-workflow)
+5. [Testing with Pytest](#testing-with-pytest)
+6. [Debugging with pdb](#debugging-with-pdb)
+7. [Performance Tips](#performance-tips)
+8. [Quick Reference Card](#quick-reference-card)
+
+---
+
+## Python Commander
+
+**TL;DR:** Press `C-c p` in any Python buffer to access all Python commands in one place.
+
+### What is Python Commander?
+
+Python Commander is a **unified command hub** that brings together all Python development features into a single, discoverable menu using Emacs' built-in `transient` system (similar to Magit's interface).
+
+### Why Use Python Commander?
+
+- 🎯 **One entry point:** `C-c p` gives you access to everything
+- 🗺️ **Discoverable:** Visual menu shows all available commands
+- 🧠 **Reduced cognitive load:** No need to memorize 20+ keybindings
+- ⚡ **Context-aware:** Only shows commands relevant to your current setup
+- 🔄 **Organized:** Commands grouped by functionality (REPL, Cells, Tests, Tools, LSP)
+
+### Quick Start
+
+```
+1. Open any Python file
+2. Press C-c p
+3. Choose category and command from menu
+```
+
+### Menu Structure
+
+```
+Python Commander (C-c p)
+│
+├─ 🔄 REPL          → z/c/r/d/l (Shell, Send buffer/region/function/file)
+├─ 📦 Cells         → n/p/e/m/% (Navigate, Eval, Mark, Menu)
+├─ 🧪 Tests         → t/f/F/T/L (Dispatch, Function, File, All, Last failed)
+├─ 🔧 Tools         → R/C/v/V/D (Ruff format/check, Venv activate/deactivate, Detect env)
+└─ 📚 LSP           → g/h/R/A/= (Go to def, Hover, Rename, Actions, Format)
+```
+
+### Keyboard Navigation
+
+Once inside Python Commander:
+- **Press a letter** to execute that command (e.g., `c` to send buffer)
+- **Press `q`** to quit the menu
+- **Press `C-g`** to cancel
+
+### Example Workflows
+
+**Workflow 1: Quick REPL interaction**
+```
+C-c p  →  c  (send buffer to REPL)
+```
+
+**Workflow 2: Execute cell and navigate**
+```
+C-c p  →  e  (eval current cell)
+C-c p  →  n  (go to next cell)
+```
+
+**Workflow 3: Run tests and format**
+```
+C-c p  →  f  (run test at point)
+C-c p  →  R  (format buffer with Ruff)
+```
+
+### High-Frequency Commands (Direct Access)
+
+For maximum speed, these commands have **direct keybindings** outside the menu:
+
+| Key | Command | Why Direct? |
+|-----|---------|-------------|
+| `C-c C-z` | Switch to REPL | Used constantly |
+| `C-c C-c` | Send buffer | High frequency |
+| `C-c %` | Cell menu | Has own transient |
+| `C-c t` | Test prefix | Well organized |
+| `C-c l` | LSP/Tools prefix | Well organized |
+
+**Best practice:** Use direct keybindings for daily commands, Python Commander for everything else.
+
+### Context-Aware Features
+
+Python Commander adapts to your setup:
+
+- **Cells section** only appears if `code-cells-mode` is active
+- **Tests commands** only appear if `pytest` is installed
+- **Tools commands** check for `ruff` availability
+- **LSP section** only shows when Eglot/LSP is running
+- **Venv commands** only if `pyvenv` is available
+
+This keeps the menu clean and focused on what you can actually use.
 
 ---
 
@@ -130,20 +222,28 @@ print(summary)
 
 ### Keybindings
 
-- `C-c C-n` - Go to next cell
-- `C-c C-p` - Go to previous cell
-- `C-c C-e` - Execute current cell
-- `C-c C-SPC` - Mark/select current cell
-- `C-c %` - Cell command menu
+**Primary access via Python Commander (`C-c p`):**
+- `C-c p n` - Go to next cell
+- `C-c p p` - Go to previous cell
+- `C-c p e` - Execute current cell
+- `C-c p m` - Mark/select current cell
+- `C-c p a` - Execute all cells above current
+
+**Direct access:**
+- `C-c %` - Cell command menu (opens transient with all cell operations)
+
+**Pro tip:** Use `C-c %` for quick access to cell-specific commands, or `C-c p` for unified Python workflow.
 
 ### Workflow
 
 1. **Create cells** with `# %%` markers
 2. **Position cursor** in a cell
-3. **Execute** with `C-c C-e` (sends to Python REPL)
-4. **Navigate** with `C-c C-n` / `C-c C-p`
+3. **Execute** with `C-c p e` or `C-c %` → `e` (sends to Python REPL)
+4. **Navigate** with `C-c p n` / `C-c p p` or use `C-c %` menu
 
 **Pro tip:** Combine with REPL (`C-c C-z`) to see results in a separate window.
+
+**Alternative:** Use `C-c %` to access the full cell menu with additional operations like duplicate, move, copy cells.
 
 ---
 
@@ -158,12 +258,20 @@ print(summary)
 
 ### Keybindings
 
+**Test prefix (`C-c t`):**
 - `C-c t t` - Pytest dispatch menu (choose what to run)
 - `C-c t f` - Run test at point (current function)
 - `C-c t m` - Run tests in current file
 - `C-c t a` - Run all tests in project
 - `C-c t l` - Re-run last failed tests
 - `C-c t r` - Repeat last pytest command
+
+**Via Python Commander (`C-c p`):**
+- `C-c p t` - Pytest dispatch
+- `C-c p f` - Run test function
+- `C-c p F` - Run test file
+- `C-c p T` - Run all tests
+- `C-c p L` - Re-run failed tests
 
 ### Setup
 
@@ -432,6 +540,107 @@ uv pip install pytest
 1. Run native compilation: `M-x my/native-compile-packages`
 2. Increase Eglot debounce: `(setq eglot-send-changes-idle-time 1.0)`
 3. Disable event logging: `(setq eglot-events-buffer-size 0)` (already set)
+
+---
+
+## Quick Reference Card
+
+### Python Commander Hub
+
+| Key | Menu | Description |
+|-----|------|-------------|
+| `C-c p` | Python Commander | **Main entry point** - Unified Python command menu |
+| `C-c %` | Cell Commands | Cell-specific transient menu |
+| `C-c t` | Test Prefix | Pytest commands prefix |
+| `C-c l` | LSP/Tools Prefix | LSP and linting/formatting commands |
+
+### High-Frequency Direct Keys
+
+| Key | Command | Category |
+|-----|---------|----------|
+| `C-c C-z` | Switch to REPL | REPL |
+| `C-c C-c` | Send buffer to REPL | REPL |
+| `C-c C-r` | Send region to REPL | REPL |
+| `C-c C-d` | Send function to REPL | REPL |
+| `C-c C-l` | Send file to REPL | REPL |
+
+### Python Commander Commands
+
+After pressing `C-c p`, use these keys:
+
+#### REPL (🔄)
+- `z` - Switch to REPL
+- `c` - Send buffer
+- `r` - Send region
+- `d` - Send function
+- `l` - Send file
+
+#### Cells (📦) - *only if code-cells-mode active*
+- `n` - Next cell
+- `p` - Previous cell
+- `e` - Eval cell
+- `m` - Mark cell
+- `%` - Cell menu (transient)
+- `a` - Eval all cells above
+
+#### Tests (🧪) - *only if pytest available*
+- `t` - Test dispatch menu
+- `f` - Test function at point
+- `F` - Test current file
+- `T` - Test all
+- `L` - Test last failed
+
+#### Tools (🔧)
+- `R` - Ruff format buffer
+- `C` - Ruff check buffer
+- `v` - Activate venv
+- `V` - Deactivate venv
+- `D` - Detect environment
+
+#### LSP (📚) - *only if LSP active*
+- `g` - Go to definition
+- `h` - Hover documentation
+- `R` - Rename symbol
+- `A` - Code actions
+- `=` - Format buffer
+
+### Workflow Recommendations
+
+**For daily REPL work:**
+```
+Use direct keys: C-c C-z, C-c C-c, C-c C-r
+```
+
+**For cell-based exploration:**
+```
+C-c % (cell menu) or C-c p (Python Commander)
+```
+
+**For testing workflow:**
+```
+C-c t f/m/a (test prefix) or C-c p t/f/F/T (Commander)
+```
+
+**For discovering new commands:**
+```
+C-c p (shows all available options)
+```
+
+**For one-off operations:**
+```
+C-c p → choose category → press letter
+Example: C-c p → R (format with Ruff)
+```
+
+### Memory Aid
+
+Think of it as **layers of access**:
+
+1. **Layer 1 (Fastest):** Direct keys for daily tasks (`C-c C-z`, `C-c C-c`)
+2. **Layer 2 (Organized):** Prefixes for grouped commands (`C-c t`, `C-c %`)
+3. **Layer 3 (Hub):** Commander for everything else (`C-c p`)
+
+**When in doubt, press `C-c p` and explore!**
 
 ---
 

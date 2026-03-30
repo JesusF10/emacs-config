@@ -361,19 +361,25 @@
 
 ;; code-cells: Jupyter-like cell execution in Python files
 ;; Use # %% to delimit cells (compatible with VS Code, Jupyter, Spyder)
+;;
+;; Keybindings:
+;;   C-c %  → code-cells-command (cell menu with all operations)
+;;   C-c p  → python-commander (unified Python menu with cell commands)
+;;
+;; All cell operations (navigate, eval, mark) available in Python Commander (C-c p)
 (use-package code-cells
   :ensure t
   :defer t
   :hook ((python-mode python-ts-mode) . code-cells-mode-maybe)
   :config
-  ;; Keybindings for cell navigation and execution
+  ;; Keybindings for cell operations
+  ;; Note: Most cell commands accessible via Python Commander (C-c p)
+  ;; Only C-c % kept for quick access to cell menu (has its own transient)
   (defun my/code-cells-setup ()
-    "Set up code-cells keybindings."
-    (local-set-key (kbd "C-c %") 'code-cells-command)
-    (local-set-key (kbd "C-c C-n") 'code-cells-forward-cell)
-    (local-set-key (kbd "C-c C-p") 'code-cells-backward-cell)
-    (local-set-key (kbd "C-c C-e") 'code-cells-eval)
-    (local-set-key (kbd "C-c C-SPC") 'code-cells-mark-cell))
+    "Set up code-cells keybindings.
+Cell navigation and eval commands moved to Python Commander (C-c p).
+Only cell menu (C-c %) kept for direct access."
+    (local-set-key (kbd "C-c %") 'code-cells-command))
   
   (add-hook 'code-cells-mode-hook #'my/code-cells-setup))
 
@@ -449,6 +455,15 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 ;; Enhanced Python REPL with IPython support
+;;
+;; Direct keybindings (high-frequency commands):
+;;   C-c C-z  → Switch to REPL
+;;   C-c C-c  → Send buffer
+;;   C-c C-r  → Send region
+;;   C-c C-d  → Send function
+;;   C-c C-l  → Send file
+;;
+;; All REPL commands also available in Python Commander (C-c p)
 (use-package python
   :ensure nil
   :defer t
@@ -511,6 +526,64 @@
   (define-key python-ts-mode-map (kbd "C-c C-r") 'my/python-shell-send-and-show)
   (define-key python-ts-mode-map (kbd "C-c C-d") 'my/python-shell-send-defun-and-show)
   (define-key python-ts-mode-map (kbd "C-c C-l") 'python-shell-send-file))
+
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; Python Commander (Transient Menu) ;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+;; Unified Python command hub using transient (built-in Emacs 28+)
+;; Access all Python functionality from a single, discoverable menu
+(with-eval-after-load 'python
+  (require 'transient)
+  
+  (transient-define-prefix python-commander ()
+    "Python Development Commander - Unified command hub for Python workflows."
+    :info-manual "(python)"
+    ["Python Commander"
+     ["🔄 REPL"
+      ("z" "Switch to REPL" python-shell-switch-to-shell)
+      ("c" "Send buffer" my/python-shell-send-buffer-and-show)
+      ("r" "Send region" my/python-shell-send-and-show)
+      ("d" "Send function" my/python-shell-send-defun-and-show)
+      ("l" "Send file" python-shell-send-file)]
+     
+     ["📦 Cells"
+      ("n" "Next cell" code-cells-forward-cell :if (lambda () (bound-and-true-p code-cells-mode)))
+      ("p" "Previous cell" code-cells-backward-cell :if (lambda () (bound-and-true-p code-cells-mode)))
+      ("e" "Eval cell" code-cells-eval :if (lambda () (bound-and-true-p code-cells-mode)))
+      ("m" "Mark cell" code-cells-mark-cell :if (lambda () (bound-and-true-p code-cells-mode)))
+      ("%" "Cell menu" code-cells-command :if (lambda () (bound-and-true-p code-cells-mode)))
+      ("a" "Eval above" code-cells-eval-above :if (lambda () (bound-and-true-p code-cells-mode)))]
+     
+     ["🧪 Tests"
+      ("t" "Test dispatch" python-pytest-dispatch :if (lambda () (fboundp 'python-pytest-dispatch)))
+      ("f" "Test function" python-pytest-function :if (lambda () (fboundp 'python-pytest-function)))
+      ("F" "Test file" python-pytest-file :if (lambda () (fboundp 'python-pytest-file)))
+      ("T" "Test all" python-pytest :if (lambda () (fboundp 'python-pytest)))
+      ("L" "Test last failed" python-pytest-last-failed :if (lambda () (fboundp 'python-pytest-last-failed)))]
+     
+     ["🔧 Tools"
+      ("R" "Ruff format" my/ruff-format-buffer :if (lambda () (executable-find "ruff")))
+      ("C" "Ruff check" my/ruff-check-buffer :if (lambda () (executable-find "ruff")))
+      ("v" "Activate venv" pyvenv-activate :if (lambda () (fboundp 'pyvenv-activate)))
+      ("V" "Deactivate venv" pyvenv-deactivate :if (lambda () (fboundp 'pyvenv-deactivate)))
+      ("D" "Detect env" my/detect-python-env :if (lambda () (fboundp 'my/detect-python-env)))]
+     
+     ["📚 LSP"
+      :if (lambda () (bound-and-true-p eglot--managed-mode))
+      ("g" "Go to definition" xref-find-definitions)
+      ("h" "Hover docs" eldoc)
+      ("R" "Rename" eglot-rename)
+      ("A" "Code actions" eglot-code-actions)
+      ("=" "Format" eglot-format)]]
+    
+    [["🚪 Quit"
+      ("q" "Quit" transient-quit-one)]])
+  
+  ;; Bind Python Commander to C-c p in Python modes
+  (define-key python-mode-map (kbd "C-c p") 'python-commander)
+  (define-key python-ts-mode-map (kbd "C-c p") 'python-commander))
 
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
