@@ -581,6 +581,80 @@ Only cell menu (C-c %) kept for direct access."
       (call-interactively 'code-cells-eval-above)
     (message "code-cells-mode not active. Enable it with M-x code-cells-mode")))
 
+;; Wrapper for pytest commands
+(defun my/python-commander-pytest-dispatch ()
+  "Run pytest dispatch if available."
+  (interactive)
+  (if (fboundp 'python-pytest-dispatch)
+      (call-interactively 'python-pytest-dispatch)
+    (message "python-pytest not available. Install with: elpaca python-pytest")))
+
+(defun my/python-commander-pytest-function ()
+  "Run pytest on function if available."
+  (interactive)
+  (if (fboundp 'python-pytest-function)
+      (call-interactively 'python-pytest-function)
+    (message "python-pytest not available")))
+
+(defun my/python-commander-pytest-file ()
+  "Run pytest on file if available."
+  (interactive)
+  (if (fboundp 'python-pytest-file)
+      (call-interactively 'python-pytest-file)
+    (message "python-pytest not available")))
+
+(defun my/python-commander-pytest-all ()
+  "Run all pytest tests if available."
+  (interactive)
+  (if (fboundp 'python-pytest)
+      (call-interactively 'python-pytest)
+    (message "python-pytest not available")))
+
+(defun my/python-commander-pytest-last-failed ()
+  "Re-run last failed pytest tests if available."
+  (interactive)
+  (if (fboundp 'python-pytest-last-failed)
+      (call-interactively 'python-pytest-last-failed)
+    (message "python-pytest not available")))
+
+;; Wrapper for venv commands
+(defun my/python-commander-venv-activate ()
+  "Activate venv if pyvenv is available."
+  (interactive)
+  (if (fboundp 'pyvenv-activate)
+      (call-interactively 'pyvenv-activate)
+    (message "pyvenv not available")))
+
+(defun my/python-commander-venv-deactivate ()
+  "Deactivate venv if pyvenv is available."
+  (interactive)
+  (if (fboundp 'pyvenv-deactivate)
+      (call-interactively 'pyvenv-deactivate)
+    (message "pyvenv not available")))
+
+;; Wrapper for environment detection
+(defun my/python-commander-detect-env ()
+  "Detect Python environment."
+  (interactive)
+  (if (fboundp 'my/detect-python-env)
+      (call-interactively 'my/detect-python-env)
+    (message "Environment detection not available")))
+
+;; Wrapper for Ruff commands
+(defun my/python-commander-ruff-format ()
+  "Format buffer with Ruff."
+  (interactive)
+  (if (and (fboundp 'my/ruff-format-buffer) (executable-find "ruff"))
+      (call-interactively 'my/ruff-format-buffer)
+    (message "Ruff not available or not installed")))
+
+(defun my/python-commander-ruff-check ()
+  "Check buffer with Ruff."
+  (interactive)
+  (if (and (fboundp 'my/ruff-check-buffer) (executable-find "ruff"))
+      (call-interactively 'my/ruff-check-buffer)
+    (message "Ruff not available or not installed")))
+
 (transient-define-prefix python-commander ()
   "Python Development Commander - Unified command hub for Python workflows."
   :info-manual "(python)"
@@ -601,26 +675,25 @@ Only cell menu (C-c %) kept for direct access."
     ("a" "Eval above" my/python-commander-cells-eval-above)]
    
    ["🧪 Tests"
-    ("t" "Test dispatch" python-pytest-dispatch :if (lambda () (fboundp 'python-pytest-dispatch)))
-    ("f" "Test function" python-pytest-function :if (lambda () (fboundp 'python-pytest-function)))
-    ("F" "Test file" python-pytest-file :if (lambda () (fboundp 'python-pytest-file)))
-    ("T" "Test all" python-pytest :if (lambda () (fboundp 'python-pytest)))
-    ("L" "Test last failed" python-pytest-last-failed :if (lambda () (fboundp 'python-pytest-last-failed)))]
+    ("t" "Test dispatch" my/python-commander-pytest-dispatch)
+    ("f" "Test function" my/python-commander-pytest-function)
+    ("F" "Test file" my/python-commander-pytest-file)
+    ("T" "Test all" my/python-commander-pytest-all)
+    ("L" "Test last failed" my/python-commander-pytest-last-failed)]
    
    ["🔧 Tools"
-    ("R" "Ruff format" my/ruff-format-buffer :if (lambda () (executable-find "ruff")))
-    ("C" "Ruff check" my/ruff-check-buffer :if (lambda () (executable-find "ruff")))
-    ("v" "Activate venv" pyvenv-activate :if (lambda () (fboundp 'pyvenv-activate)))
-    ("V" "Deactivate venv" pyvenv-deactivate :if (lambda () (fboundp 'pyvenv-deactivate)))
-    ("D" "Detect env" my/detect-python-env :if (lambda () (fboundp 'my/detect-python-env)))]
+    ("R" "Ruff format" my/python-commander-ruff-format)
+    ("C" "Ruff check" my/python-commander-ruff-check)
+    ("v" "Activate venv" my/python-commander-venv-activate)
+    ("V" "Deactivate venv" my/python-commander-venv-deactivate)
+    ("D" "Detect env" my/python-commander-detect-env)]
    
    ["📚 LSP"
-    :if (lambda () (bound-and-true-p eglot--managed-mode))
     ("g" "Go to definition" xref-find-definitions)
     ("h" "Hover docs" eldoc)
-    ("R" "Rename" eglot-rename)
-    ("A" "Code actions" eglot-code-actions)
-    ("=" "Format" eglot-format)]]
+    ("r" "Rename" eglot-rename :if (lambda () (bound-and-true-p eglot--managed-mode)))
+    ("A" "Code actions" eglot-code-actions :if (lambda () (bound-and-true-p eglot--managed-mode)))
+    ("=" "Format" eglot-format :if (lambda () (bound-and-true-p eglot--managed-mode)))]]
   
   [["🚪 Quit"
     ("q" "Quit" transient-quit-one)]])
