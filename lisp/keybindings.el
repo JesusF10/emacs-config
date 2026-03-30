@@ -24,6 +24,53 @@
   (dired user-emacs-directory))
 
 
+;;;;;;;;;;;;;;;;;;;;;;;;;
+;; Pandoc Integration  ;;
+;;;;;;;;;;;;;;;;;;;;;;;;;
+
+(defun pandoc-convert (from-format to-format)
+  "Convert current buffer using Pandoc FROM-FORMAT to TO-FORMAT."
+  (interactive
+   (list
+    (completing-read "From format: " 
+                     '("markdown" "org" "latex" "html" "docx" "rst" "typst"))
+    (completing-read "To format: " 
+                     '("pdf" "html" "docx" "latex" "markdown" "org" "rst" "typst"))))
+  (if (not (executable-find "pandoc"))
+      (message "Pandoc not found. Install with: pacman -S pandoc")
+    (let* ((input-file (buffer-file-name))
+           (output-file (concat (file-name-sans-extension input-file) "." to-format))
+           (command (format "pandoc -f %s -t %s -o %s %s"
+                            from-format to-format
+                            (shell-quote-argument output-file)
+                            (shell-quote-argument input-file))))
+      (if (not input-file)
+          (message "Buffer is not visiting a file")
+        (message "Running: %s" command)
+        (shell-command command)
+        (message "Converted to: %s" output-file)))))
+
+(defun pandoc-markdown-to-pdf ()
+  "Convert current Markdown file to PDF using Pandoc."
+  (interactive)
+  (pandoc-convert "markdown" "pdf"))
+
+(defun pandoc-org-to-pdf ()
+  "Convert current Org file to PDF using Pandoc."
+  (interactive)
+  (pandoc-convert "org" "pdf"))
+
+(defun pandoc-typst-to-pdf ()
+  "Convert current Typst file to PDF using Pandoc."
+  (interactive)
+  (pandoc-convert "typst" "pdf"))
+
+(defun pandoc-markdown-to-docx ()
+  "Convert current Markdown file to DOCX using Pandoc."
+  (interactive)
+  (pandoc-convert "markdown" "docx"))
+
+
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Manual Mapping Settings ;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -47,6 +94,15 @@
 (bind-key (kbd "i") 'open-config-file 'editor-map)
 (bind-key (kbd "R") 'restart-emacs 'editor-map)
 (bind-key (kbd "I") 'open-config-dir 'editor-map)
+
+;; Pandoc conversion bindings (C-c o p ...)
+(define-prefix-command 'pandoc-map nil "Pandoc")
+(bind-key (kbd "p") 'pandoc-map 'omni-map)
+(bind-key (kbd "c") 'pandoc-convert 'pandoc-map)              ; C-c o p c - Custom conversion
+(bind-key (kbd "m") 'pandoc-markdown-to-pdf 'pandoc-map)      ; C-c o p m - Markdown to PDF
+(bind-key (kbd "o") 'pandoc-org-to-pdf 'pandoc-map)           ; C-c o p o - Org to PDF
+(bind-key (kbd "t") 'pandoc-typst-to-pdf 'pandoc-map)         ; C-c o p t - Typst to PDF
+(bind-key (kbd "d") 'pandoc-markdown-to-docx 'pandoc-map)     ; C-c o p d - Markdown to DOCX
 
 
 ;; Key Unbinding for avoiding frame suspension
