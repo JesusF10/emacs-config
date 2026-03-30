@@ -537,6 +537,49 @@ Only cell menu (C-c %) kept for direct access."
 (with-eval-after-load 'python
   (require 'transient)
   
+  ;; Wrapper functions to handle optional packages gracefully
+  (defun my/python-commander-cells-forward ()
+    "Forward cell if code-cells-mode is active."
+    (interactive)
+    (if (and (fboundp 'code-cells-forward-cell) (bound-and-true-p code-cells-mode))
+        (call-interactively 'code-cells-forward-cell)
+      (message "code-cells-mode not active. Enable it with M-x code-cells-mode")))
+  
+  (defun my/python-commander-cells-backward ()
+    "Backward cell if code-cells-mode is active."
+    (interactive)
+    (if (and (fboundp 'code-cells-backward-cell) (bound-and-true-p code-cells-mode))
+        (call-interactively 'code-cells-backward-cell)
+      (message "code-cells-mode not active. Enable it with M-x code-cells-mode")))
+  
+  (defun my/python-commander-cells-eval ()
+    "Eval cell if code-cells-mode is active."
+    (interactive)
+    (if (and (fboundp 'code-cells-eval) (bound-and-true-p code-cells-mode))
+        (call-interactively 'code-cells-eval)
+      (message "code-cells-mode not active. Enable it with M-x code-cells-mode")))
+  
+  (defun my/python-commander-cells-mark ()
+    "Mark cell if code-cells-mode is active."
+    (interactive)
+    (if (and (fboundp 'code-cells-mark-cell) (bound-and-true-p code-cells-mode))
+        (call-interactively 'code-cells-mark-cell)
+      (message "code-cells-mode not active. Enable it with M-x code-cells-mode")))
+  
+  (defun my/python-commander-cells-menu ()
+    "Open cell menu if code-cells-mode is active."
+    (interactive)
+    (if (and (fboundp 'code-cells-command) (bound-and-true-p code-cells-mode))
+        (call-interactively 'code-cells-command)
+      (message "code-cells-mode not active. Enable it with M-x code-cells-mode")))
+  
+  (defun my/python-commander-cells-eval-above ()
+    "Eval cells above if code-cells-mode is active."
+    (interactive)
+    (if (and (fboundp 'code-cells-eval-above) (bound-and-true-p code-cells-mode))
+        (call-interactively 'code-cells-eval-above)
+      (message "code-cells-mode not active. Enable it with M-x code-cells-mode")))
+  
   (transient-define-prefix python-commander ()
     "Python Development Commander - Unified command hub for Python workflows."
     :info-manual "(python)"
@@ -549,12 +592,12 @@ Only cell menu (C-c %) kept for direct access."
       ("l" "Send file" python-shell-send-file)]
      
      ["📦 Cells"
-      ("n" "Next cell" code-cells-forward-cell :if (lambda () (bound-and-true-p code-cells-mode)))
-      ("p" "Previous cell" code-cells-backward-cell :if (lambda () (bound-and-true-p code-cells-mode)))
-      ("e" "Eval cell" code-cells-eval :if (lambda () (bound-and-true-p code-cells-mode)))
-      ("m" "Mark cell" code-cells-mark-cell :if (lambda () (bound-and-true-p code-cells-mode)))
-      ("%" "Cell menu" code-cells-command :if (lambda () (bound-and-true-p code-cells-mode)))
-      ("a" "Eval above" code-cells-eval-above :if (lambda () (bound-and-true-p code-cells-mode)))]
+      ("n" "Next cell" my/python-commander-cells-forward)
+      ("p" "Previous cell" my/python-commander-cells-backward)
+      ("e" "Eval cell" my/python-commander-cells-eval)
+      ("m" "Mark cell" my/python-commander-cells-mark)
+      ("%" "Cell menu" my/python-commander-cells-menu)
+      ("a" "Eval above" my/python-commander-cells-eval-above)]
      
      ["🧪 Tests"
       ("t" "Test dispatch" python-pytest-dispatch :if (lambda () (fboundp 'python-pytest-dispatch)))
