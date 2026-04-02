@@ -270,10 +270,17 @@
 (use-package dashboard
   :ensure t
   :init
-  ;; Set initial buffer to dashboard
-  (setq initial-buffer-choice (lambda () (get-buffer-create "*dashboard*")))
+  ;; Check if Emacs was started with file arguments
+  (defun my/emacs-started-with-file-p ()
+    "Return t if Emacs was started with a file argument."
+    (seq-some #'file-exists-p (cdr command-line-args)))
+  
   :config
-  (dashboard-setup-startup-hook)
+  ;; Only setup dashboard if no file arguments were passed
+  ;; This prevents the split window issue when opening files from terminal
+  (unless (my/emacs-started-with-file-p)
+    (setq initial-buffer-choice (lambda () (get-buffer-create "*dashboard*")))
+    (dashboard-setup-startup-hook))
   :custom
   (dashboard-banner-logo-title "Welcome to Emacs")
   (dashboard-startup-banner 'logo)
