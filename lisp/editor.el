@@ -245,7 +245,13 @@
   (corfu-preview-current nil)
   (corfu-quit-no-match 'separator)
   :bind (:map corfu-map
-              ("M-SPC" . corfu-insert-separator))) ; Optional: insert ":"
+              ("M-SPC" . corfu-insert-separator)) ; Optional: insert ":"
+  :config
+  ;; Disable Corfu in Python REPL (inferior-python-mode)
+  ;; The native completion system conflicts with Corfu causing JSON parse errors
+  (add-hook 'inferior-python-mode-hook
+            (lambda ()
+              (corfu-mode -1))))
 
 ;; Cape: extra completion sources
 (use-package cape

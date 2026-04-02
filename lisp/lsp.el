@@ -170,7 +170,7 @@
   :mode (("README\\.md\\'" . gfm-mode)
          ("\\.md\\'" . markdown-mode)
          ("\\.mdx\\'" . markdown-mode))
-  :init (setq markdown-command "multimarkdown"))
+  :init (setq markdown-command "pandoc"))
 
 ;; Typst support (modern markup language for scientific documents)
 (use-package typst-ts-mode
@@ -473,13 +473,7 @@ Only cell menu (C-c %) kept for direct access."
     (setq python-shell-interpreter "ipython"
           python-shell-interpreter-args "--simple-prompt -i --no-banner"
           python-shell-prompt-regexp "In \\[[0-9]+\\]: "
-          python-shell-prompt-output-regexp "Out\\[[0-9]+\\]: "
-          python-shell-completion-setup-code
-          "from IPython.core.completerlib import module_completion"
-          python-shell-completion-module-string-code
-          "';'.join(module_completion('''%s'''))\n"
-          python-shell-completion-string-code
-          "';'.join(get_ipython().Completer.all_completions('''%s'''))\n"))
+          python-shell-prompt-output-regexp "Out\\[[0-9]+\\]: "))
   
   ;; Better indentation
   (setq python-indent-guess-indent-offset-verbose nil)
@@ -487,8 +481,12 @@ Only cell menu (C-c %) kept for direct access."
   ;; Don't highlight indentation errors (handled by Ruff)
   (setq python-indent-def-block-scale 1)
   
-  ;; Enable shell completion
-  (setq python-shell-completion-native-enable t))
+  ;; IMPORTANT: Disable native shell completion
+  ;; Python 3.13+ pyrepl conflicts with Emacs inferior-python completion.
+  ;; The native completion sends Python code to the REPL which gets printed
+  ;; back causing JSON parse errors in completion frameworks (Corfu/Company).
+  ;; Use TAB completion in the REPL itself (IPython handles this natively).
+  (setq python-shell-completion-native-enable nil))
 
 ;; Custom helper functions for Python REPL
 (with-eval-after-load 'python
