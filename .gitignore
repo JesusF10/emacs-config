@@ -67,3 +67,6 @@ transient/
 # Documentation (internal context and implementation notes)
 CONTEXT.md
 IMPLEMENTATION_COMPLETE.md
+
+# Portfolio content for external web project
+portfolio/
