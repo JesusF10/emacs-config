@@ -70,3 +70,12 @@ IMPLEMENTATION_COMPLETE.md
 
 # Portfolio content for external web project
 portfolio/
+
+# Python development files (local testing)
+.python-version
+main.py
+pyproject.toml
+uv.lock
+
+# Project documentation (internal notes)
+EMACS_MODERNIZATION_PROJECT.mdx
