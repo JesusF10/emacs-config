@@ -481,12 +481,29 @@ Only cell menu (C-c %) kept for direct access."
   ;; Don't highlight indentation errors (handled by Ruff)
   (setq python-indent-def-block-scale 1)
   
-  ;; IMPORTANT: Disable native shell completion
+  ;; IMPORTANT: Completely disable Python shell-based completion
   ;; Python 3.13+ pyrepl conflicts with Emacs inferior-python completion.
-  ;; The native completion sends Python code to the REPL which gets printed
+  ;; The completion system sends Python code to the REPL which gets printed
   ;; back causing JSON parse errors in completion frameworks (Corfu/Company).
-  ;; Use TAB completion in the REPL itself (IPython handles this natively).
-  (setq python-shell-completion-native-enable nil))
+  ;; 
+  ;; We rely on Eglot + Ty for completions in .py files instead.
+  ;; For REPL completions, use IPython's built-in TAB completion.
+  (setq python-shell-completion-native-enable nil)
+  
+  ;; Remove ALL shell-based completion functions from capf in python buffers
+  ;; Both python-completion-at-point and python-shell-completion-at-point
+  ;; try to use the REPL for completions, causing issues with Python 3.13+
+  (defun my/python-disable-shell-completion ()
+    "Remove shell-based completion from python-mode.
+Eglot provides completions via LSP, so we don't need REPL-based completion."
+    (setq-local completion-at-point-functions
+                (seq-remove (lambda (fn)
+                              (memq fn '(python-completion-at-point
+                                         python-shell-completion-at-point)))
+                            completion-at-point-functions)))
+  
+  (add-hook 'python-mode-hook #'my/python-disable-shell-completion)
+  (add-hook 'python-ts-mode-hook #'my/python-disable-shell-completion))
 
 ;; Custom helper functions for Python REPL
 (with-eval-after-load 'python
@@ -660,7 +677,7 @@ Only cell menu (C-c %) kept for direct access."
    ["🔄 REPL"
     ("z" "Switch to REPL" python-shell-switch-to-shell)
     ("c" "Send buffer" my/python-shell-send-buffer-and-show)
-    ("r" "Send region" my/python-shell-send-and-show)
+    ("s" "Send region" my/python-shell-send-and-show)
     ("d" "Send function" my/python-shell-send-defun-and-show)
     ("l" "Send file" python-shell-send-file)]
    
